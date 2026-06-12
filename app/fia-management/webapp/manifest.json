@@ -1,0 +1,127 @@
+{
+  "_version": "1.59.0",
+
+  "sap.app": {
+    "id": "onee.courbes.fiamanagement",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": { "version": "0.0.1" },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "sourceTemplate": { "id": "@sap/generator-fiori:lrop" },
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v4/courbes/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      }
+    },
+    "crossNavigation": {
+      "inbounds": {
+        "FIA-manage": {
+          "semanticObject": "FIA",
+          "action": "manage",
+          "title": "{{appTitle}}",
+          "subTitle": "{{appSubTitle}}",
+          "icon": "sap-icon://document-text",
+          "signature": {
+            "parameters": {},
+            "additionalParameters": "allowed"
+          }
+        }
+      }
+    }
+  },
+
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": { "icon": "sap-icon://document-text" },
+    "fullWidth": false,
+    "supportedThemes": ["sap_horizon", "sap_fiori_3"]
+  },
+
+  "sap.ui5": {
+    "flexEnabled": true,
+    "dependencies": {
+      "minUI5Version": "1.108.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.ushell": {},
+        "sap.fe.templates": {}
+      }
+    },
+    "contentDensities": { "compact": true, "cozy": true },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "onee.courbes.fiamanagement.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {
+          "synchronizationMode": "None",
+          "operationMode": "Server",
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      }
+    },
+    "routing": {
+      "config": {},
+      "routes": [
+        {
+          "pattern": ":?query:",
+          "name": "FIAList",
+          "target": "FIAList"
+        },
+        {
+          "pattern": "FIA({key}):?query:",
+          "name": "FIAObjectPage",
+          "target": "FIAObjectPage"
+        }
+      ],
+      "targets": {
+        "FIAList": {
+          "type": "Component",
+          "id": "FIAList",
+          "name": "sap.fe.templates.ListReport",
+          "options": {
+            "settings": {
+              "entitySet": "FIA",
+              "variantManagement": "Page",
+              "initialLoad": "Enabled",
+              "navigation": {
+                "FIA": {
+                  "detail": { "route": "FIAObjectPage" }
+                }
+              }
+            }
+          }
+        },
+        "FIAObjectPage": {
+          "type": "Component",
+          "id": "FIAObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "entitySet": "FIA",
+              "editableHeaderContent": false
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "sap.fiori": {
+    "registrationIds": [],
+    "archeType": "transactional"
+  }
+}

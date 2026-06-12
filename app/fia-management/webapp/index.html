@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ONEE – FIA Management</title>
+
+  <!-- Configuration du Fiori Launchpad sandbox -->
+  <script>
+    window["sap-ushell-config"] = {
+      defaultRenderer: "fiori2",
+      renderers: {
+        fiori2: {
+          componentData: {
+            config: {
+              sessionTimeoutIntervalInMinutes: -1,
+              seamless: false
+            }
+          }
+        }
+      },
+      services: {
+        LaunchPage: {
+          adapter: {
+            config: {
+              groups: [{
+                id: "group_onee",
+                title: "ONEE — Courbes de Charge",
+                tiles: [{
+                  tileType: "sap.ushell.ui.tile.StaticTile",
+                  properties: {
+                    title: "FIA Management",
+                    subtitle: "Fiches Information Appareil",
+                    icon: "sap-icon://document-text",
+                    targetURL: "#FIA-manage"
+                  }
+                }]
+              }]
+            }
+          }
+        },
+        NavTargetResolution: {
+          adapter: {
+            config: {
+              applications: {
+                "FIA-manage": {
+                  additionalInformation: "SAPUI5.Component=onee.courbes.fiamanagement",
+                  applicationType: "URL",
+                  url: "/fia-management/webapp",
+                  description: "Fiches Information Appareil"
+                }
+              }
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Bootstrap SAPUI5 + initialisation du sandbox Fiori -->
+  <script
+    id="sap-ui-bootstrap"
+    src="https://ui5.sap.com/1.120.23/resources/sap-ui-core.js"
+    data-sap-ui-libs="sap.m, sap.ushell, sap.fe.templates, sap.fe.core"
+    data-sap-ui-compatVersion="edge"
+    data-sap-ui-async="true"
+    data-sap-ui-frameOptions="allow"
+    data-sap-ui-theme="sap_horizon"
+    data-sap-ui-on-init="module:sap/ushell/bootstrap/sandbox"
+    data-sap-ui-resourceroots='{"onee.courbes.fiamanagement": "/fia-management/webapp/"}'
+  ></script>
+</head>
+<body class="sapUiBody" id="content"></body>
+</html>

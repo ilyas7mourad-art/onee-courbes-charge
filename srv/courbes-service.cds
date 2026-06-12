@@ -12,7 +12,16 @@ service CourbesService @(path: '/odata/v4/courbes') {
   entity Compteur      as projection on db.Compteur;
 
   // ── Imports (FIA) ────────────────────────────────────────────
-  entity FIA           as projection on db.FIA;
+  // statutCriticality : champ calculé (1=rouge, 2=orange, 3=vert) utilisé par Fiori Elements
+  entity FIA as projection on db.FIA {
+    *,
+    case statut
+      when 'VALIDE'   then 3
+      when 'ERREUR'   then 1
+      when 'EN_COURS' then 2
+      else                 0
+    end as statutCriticality : Integer
+  };
 
   // ── Mesures & Qualité ────────────────────────────────────────
   entity MesureInterval as projection on db.MesureInterval;
