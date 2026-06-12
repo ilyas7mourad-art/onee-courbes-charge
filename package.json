@@ -9,11 +9,12 @@
     "node": ">=20"
   },
   "dependencies": {
-    "@sap/cds": "^9"
+    "@sap/cds": "^9",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@sap/cds-dk": "^9",
-    "@cap-js/sqlite": "^2.4.0"
+    "@cap-js/sqlite": "^2.4.0",
+    "@sap/cds-dk": "^9"
   },
   "scripts": {
     "start": "cds-serve",

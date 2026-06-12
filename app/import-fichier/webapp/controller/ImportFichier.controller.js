@@ -6,17 +6,14 @@ sap.ui.define([
 
     return Controller.extend("onee.courbes.importfichier.controller.ImportFichier", {
 
-        _sCompteurID : null,
-        _sNomFichier : null,
-        _sContenuBase64 : null,
+        _sSerge          : null,
+        _sNomFichier     : null,
+        _sContenuBase64  : null,
 
-        onInit: function () {
-            // OData V4 model initialised from manifest
-        },
+        onInit: function () { /* OData V4 model initialised from manifest */ },
 
-        onCompteurChange: function (oEvent) {
-            var oItem = oEvent.getParameter("selectedItem");
-            this._sCompteurID = oItem ? oItem.getKey() : null;
+        onSergeChange: function (oEvent) {
+            this._sSerge = oEvent.getParameter("value").trim() || null;
             this._checkImportReady();
         },
 
@@ -35,7 +32,7 @@ sap.ui.define([
                 oBadge.setVisible(true);
                 oBadge.setText("Format non supporté : ." + sExt);
                 oBadge.setState("Error");
-                this._sNomFichier    = null;
+                this._sNomFichier   = null;
                 this._sContenuBase64 = null;
                 this._checkImportReady();
                 return;
@@ -48,6 +45,7 @@ sap.ui.define([
 
             var oReader = new FileReader();
             oReader.onload = function (e) {
+                // readAsDataURL gives "data:<mime>;base64,<content>" — strip prefix
                 this._sContenuBase64 = e.target.result.split(",")[1];
                 this._checkImportReady();
             }.bind(this);
@@ -62,7 +60,9 @@ sap.ui.define([
         },
 
         _checkImportReady: function () {
-            var bEnabled = !!(this._sCompteurID && this._sNomFichier && this._sContenuBase64);
+            // SERGE can be empty — the file itself provides it (PRN Meter ID / XLSX C1)
+            // but we still require a file to be selected
+            var bEnabled = !!(this._sNomFichier && this._sContenuBase64);
             this.byId("btnImport").setEnabled(bEnabled);
         },
 
@@ -72,9 +72,10 @@ sap.ui.define([
             oBtn.setBusy(true);
 
             var oAction = oModel.bindContext("/importerFichier(...)");
-            oAction.setParameter("compteurID",    this._sCompteurID);
-            oAction.setParameter("nomFichier",    this._sNomFichier);
-            oAction.setParameter("contenuBase64", this._sContenuBase64);
+            // serge is optional — the parser extracts it from the file
+            oAction.setParameter("serge",          this._sSerge || "");
+            oAction.setParameter("nomFichier",     this._sNomFichier);
+            oAction.setParameter("contenuBase64",  this._sContenuBase64);
 
             oAction.execute()
                 .then(function () {
@@ -92,10 +93,12 @@ sap.ui.define([
         },
 
         _showResult: function (oResult) {
-            var bOk = oResult.statut === "VALIDE";
+            var bOk = oResult.statut === "V";
             this.byId("msgStrip")
                 .setType(bOk ? "Success" : "Error")
-                .setText(bOk ? "Import réussi" : "Import en erreur");
+                .setText(bOk
+                    ? "Import réussi — " + (oResult.nbLignes || 0) + " relevé(s) insérés"
+                    : "Import en erreur");
 
             this.byId("txtFormat").setText(oResult.formatDetecte || "-");
             this.byId("txtNbLignes").setText(String(oResult.nbLignes  || 0));

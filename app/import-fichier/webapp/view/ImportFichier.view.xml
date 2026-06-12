@@ -2,7 +2,6 @@
     xmlns:mvc="sap.ui.core.mvc"
     xmlns="sap.m"
     xmlns:unified="sap.ui.unified"
-    xmlns:core="sap.ui.core"
     controllerName="onee.courbes.importfichier.controller.ImportFichier"
     displayBlock="true">
 
@@ -16,19 +15,14 @@
                             <content>
                                 <VBox class="sapUiSmallMargin">
 
-                                    <Label text="Compteur" required="true"
+                                    <Label text="Numéro de série (SERGE)" required="true"
                                         class="sapUiSmallMarginBottom"/>
-                                    <ComboBox
-                                        id="cmbCompteur"
-                                        width="100%"
-                                        placeholder="Sélectionnez un compteur..."
-                                        selectionChange=".onCompteurChange"
-                                        items="{/Compteur}">
-                                        <core:ListItem
-                                            key="{ID}"
-                                            text="{meterID}"
-                                            additionalText="{localisation}"/>
-                                    </ComboBox>
+                                    <Input
+                                        id="inpSerge"
+                                        width="20rem"
+                                        maxLength="20"
+                                        placeholder="Ex : 02826294"
+                                        liveChange=".onSergeChange"/>
 
                                     <Label text="Fichier (.prn ou .xlsx)" required="true"
                                         class="sapUiMediumMarginTop sapUiSmallMarginBottom"/>
@@ -72,19 +66,19 @@
                                         showCloseButton="false"
                                         class="sapUiSmallMarginBottom"/>
                                     <HBox class="sapUiSmallMarginBottom">
-                                        <Label text="Format détecté :" width="10rem"/>
+                                        <Label text="Format détecté :" width="12rem"/>
                                         <Text id="txtFormat"/>
                                     </HBox>
                                     <HBox class="sapUiSmallMarginBottom">
-                                        <Label text="Lignes importées :" width="10rem"/>
+                                        <Label text="Lignes importées :" width="12rem"/>
                                         <Text id="txtNbLignes"/>
                                     </HBox>
                                     <HBox class="sapUiSmallMarginBottom">
-                                        <Label text="Anomalies :" width="10rem"/>
+                                        <Label text="Anomalies :" width="12rem"/>
                                         <Text id="txtNbAnomalies"/>
                                     </HBox>
                                     <HBox>
-                                        <Label text="Message :" width="10rem"/>
+                                        <Label text="Message :" width="12rem"/>
                                         <Text id="txtMessage" wrapping="true"/>
                                     </HBox>
                                 </VBox>
