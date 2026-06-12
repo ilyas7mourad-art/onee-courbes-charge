@@ -1,3 +1,0 @@
-ID,fia_ID,mesure_ID,typeAnomalie,horodatageAnomalie,description
-66666666-6666-6666-6666-000000000001,44444444-4444-4444-4444-000000000002,55555555-5555-5555-5555-000000000008,STATUT_PANNE,2024-01-15T00:10:00Z,Intervalle 00:10 du 15/01/2024 en état PDN (panne) : puissances active et réactive nulles détectées sur le compteur CLOU 7623000684. Vérification terrain requise.
-66666666-6666-6666-6666-000000000002,44444444-4444-4444-4444-000000000003,,FORMAT_INVALIDE,2024-01-15T00:00:00Z,Fichier 09123456_20240115.xlsx (type instantané) : 1 horodatage hors plage journalière détecté. Ligne ignorée lors de l'import.

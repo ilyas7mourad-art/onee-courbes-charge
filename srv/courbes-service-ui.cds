@@ -1,289 +1,178 @@
 using CourbesService from './courbes-service';
 
 // ═══════════════════════════════════════════════════════════════
-//  CLIENT
+//  ZccCadrans
 // ═══════════════════════════════════════════════════════════════
-annotate CourbesService.Client with @(
+annotate CourbesService.ZccCadrans with @(
   UI.HeaderInfo: {
-    TypeName      : 'Client',
-    TypeNamePlural: 'Clients',
-    Title      : { $Type: 'UI.DataField', Value: nomClient        },
-    Description: { $Type: 'UI.DataField', Value: secteurActivite  }
+    TypeName      : 'Cadran',
+    TypeNamePlural: 'Cadrans',
+    Title      : { $Type: 'UI.DataField', Value: COD_CADRAN },
+    Description: { $Type: 'UI.DataField', Value: LIB_CADRAN }
   },
-  UI.SelectionFields: [ secteurActivite ],
+  UI.SelectionFields: [ COD_CADRAN, ACTIF ],
   UI.LineItem: [
-    { $Type: 'UI.DataField', Value: nomClient,       Label: 'Client'           },
-    { $Type: 'UI.DataField', Value: secteurActivite, Label: 'Secteur d''activité' }
+    { $Type: 'UI.DataField', Value: COD_CADRAN, Label: 'Code cadran'  },
+    { $Type: 'UI.DataField', Value: LIB_CADRAN, Label: 'Libellé'      },
+    { $Type: 'UI.DataField', Value: ACTIF,      Label: 'Actif'        },
+    { $Type: 'UI.DataField', Value: COEFF,      Label: 'Coefficient'  },
+    { $Type: 'UI.DataField', Value: ORDRE,      Label: 'Ordre'        }
   ],
-  UI.FieldGroup #InfoClient: {
+  UI.FieldGroup #InfoCadran: {
     $Type: 'UI.FieldGroupType',
-    Label: 'Informations client',
+    Label: 'Informations cadran',
     Data : [
-      { $Type: 'UI.DataField', Value: nomClient,       Label: 'Nom du client'     },
-      { $Type: 'UI.DataField', Value: secteurActivite, Label: 'Secteur d''activité' }
+      { $Type: 'UI.DataField', Value: MANDT,      Label: 'Mandant'      },
+      { $Type: 'UI.DataField', Value: COD_CADRAN, Label: 'Code cadran'  },
+      { $Type: 'UI.DataField', Value: LIB_CADRAN, Label: 'Libellé'      },
+      { $Type: 'UI.DataField', Value: ACTIF,      Label: 'Actif'        },
+      { $Type: 'UI.DataField', Value: COEFF,      Label: 'Coefficient'  },
+      { $Type: 'UI.DataField', Value: ORDRE,      Label: 'Ordre'        }
+    ]
+  },
+  UI.FieldGroup #AuditCadran: {
+    $Type: 'UI.FieldGroupType',
+    Label: 'Audit',
+    Data : [
+      { $Type: 'UI.DataField', Value: ERNAM, Label: 'Créé par'       },
+      { $Type: 'UI.DataField', Value: ERDAT, Label: 'Date création'  },
+      { $Type: 'UI.DataField', Value: ERZET, Label: 'Heure création' },
+      { $Type: 'UI.DataField', Value: AENAM, Label: 'Modifié par'    },
+      { $Type: 'UI.DataField', Value: AEDAT, Label: 'Date modif.'    },
+      { $Type: 'UI.DataField', Value: AEZET, Label: 'Heure modif.'   }
     ]
   },
   UI.Facets: [
     {
       $Type : 'UI.ReferenceFacet',
-      ID    : 'InfoClientFacet',
-      Label : 'Informations client',
-      Target: '@UI.FieldGroup#InfoClient'
+      ID    : 'InfoCadranFacet',
+      Label : 'Informations cadran',
+      Target: '@UI.FieldGroup#InfoCadran'
     },
     {
       $Type : 'UI.ReferenceFacet',
-      ID    : 'ContratsFacet',
-      Label : 'Contrats',
-      Target: 'contrats/@UI.LineItem'
+      ID    : 'AuditCadranFacet',
+      Label : 'Audit',
+      Target: '@UI.FieldGroup#AuditCadran'
     }
   ]
 );
 
 // ═══════════════════════════════════════════════════════════════
-//  CONTRAT
+//  ZccCourbeChargesIndexs
 // ═══════════════════════════════════════════════════════════════
-annotate CourbesService.Contrat with @(
+annotate CourbesService.ZccCourbeChargesIndexs with @(
   UI.HeaderInfo: {
-    TypeName      : 'Contrat',
-    TypeNamePlural: 'Contrats',
-    Title      : { $Type: 'UI.DataField', Value: numeroContrat      },
-    Description: { $Type: 'UI.DataField', Value: puissanceSouscrite }
+    TypeName      : 'Relevé d''index',
+    TypeNamePlural: 'Relevés d''index',
+    Title      : { $Type: 'UI.DataField', Value: SERGE      },
+    Description: { $Type: 'UI.DataField', Value: DAT_RELEVE }
   },
-  UI.SelectionFields: [ numeroContrat ],
+  UI.SelectionFields: [ SERGE, DAT_RELEVE, COD_CADRAN, STATUT ],
   UI.LineItem: [
-    { $Type: 'UI.DataField', Value: numeroContrat,      Label: 'N° Contrat'          },
-    { $Type: 'UI.DataField', Value: cosPhi,             Label: 'Cos φ'               },
-    { $Type: 'UI.DataField', Value: puissanceSouscrite, Label: 'PS souscrite (kVA)'  },
-    { $Type: 'UI.DataField', Value: dateDebut,          Label: 'Date début'          },
-    { $Type: 'UI.DataField', Value: dateFin,            Label: 'Date fin'            }
+    { $Type: 'UI.DataField', Value: SERGE,      Label: 'N° série'      },
+    { $Type: 'UI.DataField', Value: DAT_RELEVE, Label: 'Date relevé'   },
+    { $Type: 'UI.DataField', Value: HEU_RELEVE, Label: 'Heure relevé'  },
+    { $Type: 'UI.DataField', Value: COD_CADRAN, Label: 'Cadran'        },
+    { $Type: 'UI.DataField', Value: VAL_CADRAN, Label: 'Valeur'        },
+    { $Type: 'UI.DataField', Value: STATUT,     Label: 'Statut'        },
+    { $Type: 'UI.DataField', Value: MESSAGE,    Label: 'Message'       }
   ],
-  UI.FieldGroup #InfoContrat: {
+  UI.FieldGroup #InfoIndex: {
     $Type: 'UI.FieldGroupType',
-    Label: 'Informations contrat',
+    Label: 'Données de relevé',
     Data : [
-      { $Type: 'UI.DataField', Value: numeroContrat,      Label: 'N° Contrat'         },
-      { $Type: 'UI.DataField', Value: cosPhi,             Label: 'Cos φ'              },
-      { $Type: 'UI.DataField', Value: puissanceSouscrite, Label: 'PS souscrite (kVA)' },
-      { $Type: 'UI.DataField', Value: dateDebut,          Label: 'Date début'         },
-      { $Type: 'UI.DataField', Value: dateFin,            Label: 'Date fin'           }
+      { $Type: 'UI.DataField', Value: MANDT,      Label: 'Mandant'       },
+      { $Type: 'UI.DataField', Value: SERGE,      Label: 'N° série'      },
+      { $Type: 'UI.DataField', Value: DAT_RELEVE, Label: 'Date relevé'   },
+      { $Type: 'UI.DataField', Value: HEU_RELEVE, Label: 'Heure relevé'  },
+      { $Type: 'UI.DataField', Value: COD_CADRAN, Label: 'Cadran'        },
+      { $Type: 'UI.DataField', Value: VAL_CADRAN, Label: 'Valeur cadran' },
+      { $Type: 'UI.DataField', Value: STATUT,     Label: 'Statut'        },
+      { $Type: 'UI.DataField', Value: MESSAGE,    Label: 'Message'       }
+    ]
+  },
+  UI.FieldGroup #AuditIndex: {
+    $Type: 'UI.FieldGroupType',
+    Label: 'Audit',
+    Data : [
+      { $Type: 'UI.DataField', Value: ERNAM, Label: 'Créé par'       },
+      { $Type: 'UI.DataField', Value: ERDAT, Label: 'Date création'  },
+      { $Type: 'UI.DataField', Value: ERZET, Label: 'Heure création' },
+      { $Type: 'UI.DataField', Value: AENAM, Label: 'Modifié par'    },
+      { $Type: 'UI.DataField', Value: AEDAT, Label: 'Date modif.'    },
+      { $Type: 'UI.DataField', Value: AEZET, Label: 'Heure modif.'   }
     ]
   },
   UI.Facets: [
     {
       $Type : 'UI.ReferenceFacet',
-      ID    : 'InfoContratFacet',
-      Label : 'Informations contrat',
-      Target: '@UI.FieldGroup#InfoContrat'
+      ID    : 'InfoIndexFacet',
+      Label : 'Données de relevé',
+      Target: '@UI.FieldGroup#InfoIndex'
     },
     {
       $Type : 'UI.ReferenceFacet',
-      ID    : 'CompteursFacet',
-      Label : 'Compteurs',
-      Target: 'compteurs/@UI.LineItem'
+      ID    : 'AuditIndexFacet',
+      Label : 'Audit',
+      Target: '@UI.FieldGroup#AuditIndex'
     }
   ]
 );
 
 // ═══════════════════════════════════════════════════════════════
-//  COMPTEUR
+//  ZccCourbeChargesCalculed
 // ═══════════════════════════════════════════════════════════════
-annotate CourbesService.Compteur with @(
+annotate CourbesService.ZccCourbeChargesCalculed with @(
   UI.HeaderInfo: {
-    TypeName      : 'Compteur',
-    TypeNamePlural: 'Compteurs',
-    Title      : { $Type: 'UI.DataField', Value: meterID      },
-    Description: { $Type: 'UI.DataField', Value: typeCompteur }
+    TypeName      : 'Résultat calculé',
+    TypeNamePlural: 'Résultats calculés',
+    Title      : { $Type: 'UI.DataField', Value: CLE_METIER        },
+    Description: { $Type: 'UI.DataField', Value: CHAMPS_AGREGATION }
   },
-  UI.SelectionFields: [ typeCompteur, marque ],
+  UI.SelectionFields: [ CLE_METIER, STATUT, ERDAT ],
   UI.LineItem: [
-    { $Type: 'UI.DataField', Value: meterID,      Label: 'Meter ID'      },
-    { $Type: 'UI.DataField', Value: numeroSerie,  Label: 'N° série'      },
-    { $Type: 'UI.DataField', Value: typeCompteur, Label: 'Type'          },
-    { $Type: 'UI.DataField', Value: marque,       Label: 'Marque'        },
-    { $Type: 'UI.DataField', Value: localisation, Label: 'Localisation'  }
+    { $Type: 'UI.DataField', Value: CLE_METIER,        Label: 'Clé métier'        },
+    { $Type: 'UI.DataField', Value: CHAMPS_AGREGATION, Label: 'Champs agrégation' },
+    { $Type: 'UI.DataField', Value: STATUT,            Label: 'Statut'            },
+    { $Type: 'UI.DataField', Value: ERDAT,             Label: 'Date création'     },
+    { $Type: 'UI.DataField', Value: MESSAGE,           Label: 'Message'           }
   ],
-  UI.FieldGroup #InfoCompteur: {
+  UI.FieldGroup #InfoCalcul: {
     $Type: 'UI.FieldGroupType',
-    Label: 'Informations compteur',
+    Label: 'Résultat calculé',
     Data : [
-      { $Type: 'UI.DataField', Value: meterID,      Label: 'Meter ID'     },
-      { $Type: 'UI.DataField', Value: numeroSerie,  Label: 'N° série'     },
-      { $Type: 'UI.DataField', Value: typeCompteur, Label: 'Type'         },
-      { $Type: 'UI.DataField', Value: marque,       Label: 'Marque'       },
-      { $Type: 'UI.DataField', Value: modele,       Label: 'Modèle'       },
-      { $Type: 'UI.DataField', Value: localisation, Label: 'Localisation' },
-      { $Type: 'UI.DataField', Value: datePose,     Label: 'Date de pose' }
+      { $Type: 'UI.DataField', Value: MANDT,             Label: 'Mandant'           },
+      { $Type: 'UI.DataField', Value: CLE_METIER,        Label: 'Clé métier'        },
+      { $Type: 'UI.DataField', Value: CHAMPS_AGREGATION, Label: 'Champs agrégation' },
+      { $Type: 'UI.DataField', Value: STATUT,            Label: 'Statut'            },
+      { $Type: 'UI.DataField', Value: MESSAGE,           Label: 'Message'           }
+    ]
+  },
+  UI.FieldGroup #AuditCalcul: {
+    $Type: 'UI.FieldGroupType',
+    Label: 'Audit',
+    Data : [
+      { $Type: 'UI.DataField', Value: ERNAM, Label: 'Créé par'       },
+      { $Type: 'UI.DataField', Value: ERDAT, Label: 'Date création'  },
+      { $Type: 'UI.DataField', Value: ERZET, Label: 'Heure création' },
+      { $Type: 'UI.DataField', Value: AENAM, Label: 'Modifié par'    },
+      { $Type: 'UI.DataField', Value: AEDAT, Label: 'Date modif.'    },
+      { $Type: 'UI.DataField', Value: AEZET, Label: 'Heure modif.'   }
     ]
   },
   UI.Facets: [
     {
       $Type : 'UI.ReferenceFacet',
-      ID    : 'InfoCompteurFacet',
-      Label : 'Informations compteur',
-      Target: '@UI.FieldGroup#InfoCompteur'
+      ID    : 'InfoCalculFacet',
+      Label : 'Résultat calculé',
+      Target: '@UI.FieldGroup#InfoCalcul'
     },
     {
       $Type : 'UI.ReferenceFacet',
-      ID    : 'FIAsFacet',
-      Label : 'Fiches FIA',
-      Target: 'mesures/@UI.LineItem'
+      ID    : 'AuditCalculFacet',
+      Label : 'Audit',
+      Target: '@UI.FieldGroup#AuditCalcul'
     }
-  ]
-);
-
-// ═══════════════════════════════════════════════════════════════
-//  FIA — entête de l'Object Page
-// ═══════════════════════════════════════════════════════════════
-annotate CourbesService.FIA with @(
-  UI.HeaderInfo: {
-    TypeName      : 'FIA',
-    TypeNamePlural: 'Fiches Information Appareil',
-    Title      : { $Type: 'UI.DataField', Value: nomFichier },
-    Description: { $Type: 'UI.DataField', Value: statut     }
-  }
-);
-
-// ═══════════════════════════════════════════════════════════════
-//  FIA — barre de filtres du List Report
-// ═══════════════════════════════════════════════════════════════
-annotate CourbesService.FIA with @(
-  UI.SelectionFields: [ statut, formatFichier ]
-);
-
-// ═══════════════════════════════════════════════════════════════
-//  FIA — colonnes du List Report
-// ═══════════════════════════════════════════════════════════════
-annotate CourbesService.FIA with @(
-  UI.LineItem: [
-    {
-      $Type      : 'UI.DataField',
-      Value      : nomFichier,
-      Label      : 'Fichier'
-    },
-    {
-      $Type      : 'UI.DataField',
-      Value      : formatFichier,
-      Label      : 'Format'
-    },
-    {
-      $Type      : 'UI.DataField',
-      Value      : statut,
-      Label      : 'Statut',
-      Criticality: statutCriticality  // 1=rouge ERREUR, 2=orange EN_COURS, 3=vert VALIDE
-    },
-    {
-      $Type      : 'UI.DataField',
-      Value      : nbLignesImportees,
-      Label      : 'Lignes importées'
-    },
-    {
-      $Type      : 'UI.DataField',
-      Value      : nbAnomalies,
-      Label      : 'Anomalies'
-    },
-    {
-      $Type      : 'UI.DataField',
-      Value      : psEstimeeKva,
-      Label      : 'PS estimée (kVA)'
-    },
-    {
-      $Type      : 'UI.DataField',
-      Value      : ajustementKva,
-      Label      : 'Ajustement (kVA)'
-    }
-  ]
-);
-
-// ═══════════════════════════════════════════════════════════════
-//  FIA — groupes de champs de l'Object Page
-// ═══════════════════════════════════════════════════════════════
-annotate CourbesService.FIA with @(
-
-  UI.FieldGroup #InfoFichier: {
-    $Type: 'UI.FieldGroupType',
-    Label: 'Informations fichier',
-    Data : [
-      { $Type: 'UI.DataField', Value: nomFichier,    Label: 'Nom du fichier' },
-      { $Type: 'UI.DataField', Value: formatFichier, Label: 'Format'         },
-      { $Type: 'UI.DataField', Value: sousTypeXlsx,  Label: 'Sous-type xlsx' },
-      {
-        $Type      : 'UI.DataField',
-        Value      : statut,
-        Label      : 'Statut',
-        Criticality: statutCriticality
-      }
-    ]
-  },
-
-  UI.FieldGroup #ResultatsCalcul: {
-    $Type: 'UI.FieldGroupType',
-    Label: 'Résultats de calcul',
-    Data : [
-      { $Type: 'UI.DataField', Value: puissanceActiveKw,     Label: 'Puissance active (kW)'     },
-      { $Type: 'UI.DataField', Value: puissanceApparenteKva, Label: 'Puissance apparente (kVA)' },
-      { $Type: 'UI.DataField', Value: psEstimeeKva,          Label: 'PS estimée (kVA)'          },
-      { $Type: 'UI.DataField', Value: ajustementKva,         Label: 'Ajustement (kVA)'          }
-    ]
-  }
-
-);
-
-// ═══════════════════════════════════════════════════════════════
-//  FIA — sections de l'Object Page (Facets)
-// ═══════════════════════════════════════════════════════════════
-annotate CourbesService.FIA with @(
-  UI.Facets: [
-    {
-      $Type : 'UI.ReferenceFacet',
-      ID    : 'InfoFichierFacet',
-      Label : 'Informations fichier',
-      Target: '@UI.FieldGroup#InfoFichier'
-    },
-    {
-      $Type : 'UI.ReferenceFacet',
-      ID    : 'ResultatsCalculFacet',
-      Label : 'Résultats de calcul',
-      Target: '@UI.FieldGroup#ResultatsCalcul'
-    },
-    {
-      $Type : 'UI.ReferenceFacet',
-      ID    : 'MesuresFacet',
-      Label : 'Mesures',
-      Target: 'mesures/@UI.LineItem'
-    },
-    {
-      $Type : 'UI.ReferenceFacet',
-      ID    : 'AnomaliesFacet',
-      Label : 'Anomalies',
-      Target: 'anomalies/@UI.LineItem'
-    }
-  ]
-);
-
-// ═══════════════════════════════════════════════════════════════
-//  MesureInterval — colonnes de la section "Mesures"
-// ═══════════════════════════════════════════════════════════════
-annotate CourbesService.MesureInterval with @(
-  UI.LineItem: [
-    { $Type: 'UI.DataField', Value: horodatage,            Label: 'Horodatage'              },
-    { $Type: 'UI.DataField', Value: dureeIntervalleMin,    Label: 'Pas (min)'               },
-    { $Type: 'UI.DataField', Value: puissanceActiveKw,     Label: 'P active (kW)'           },
-    { $Type: 'UI.DataField', Value: puissanceReactiveKvar, Label: 'Q réactive (kVAr)'       },
-    { $Type: 'UI.DataField', Value: energieActiveKwh,      Label: 'Énergie active (kWh)'    },
-    { $Type: 'UI.DataField', Value: energieReactiveKvarh,  Label: 'Énergie réactive (kVArh)'},
-    { $Type: 'UI.DataField', Value: sourceFormat,          Label: 'Source'                  },
-    { $Type: 'UI.DataField', Value: etatCourbe,            Label: 'État courbe'             },
-    { $Type: 'UI.DataField', Value: flagAnomalie,          Label: 'Anomalie'                }
-  ]
-);
-
-// ═══════════════════════════════════════════════════════════════
-//  QualiteDonnee — colonnes de la section "Anomalies"
-// ═══════════════════════════════════════════════════════════════
-annotate CourbesService.QualiteDonnee with @(
-  UI.LineItem: [
-    { $Type: 'UI.DataField', Value: typeAnomalie,       Label: 'Type'        },
-    { $Type: 'UI.DataField', Value: horodatageAnomalie, Label: 'Horodatage'  },
-    { $Type: 'UI.DataField', Value: description,        Label: 'Description' }
   ]
 );
