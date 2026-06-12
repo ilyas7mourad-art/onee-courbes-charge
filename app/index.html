@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONEE — Gestion des Courbes de Charge</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "72", "72full", Arial, Helvetica, sans-serif;
+      background: #f5f6f7;
+      color: #32363a;
+      min-height: 100vh;
+    }
+
+    /* ── Header ─────────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #003d85 0%, #0070f2 100%);
+      color: #fff;
+      padding: 2rem 2.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    .header-logo {
+      width: 48px;
+      height: 48px;
+      background: rgba(255,255,255,.15);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      font-weight: 700;
+      letter-spacing: -1px;
+      flex-shrink: 0;
+    }
+    .header-text h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .header-text p {
+      font-size: .875rem;
+      opacity: .8;
+      margin-top: .25rem;
+    }
+
+    /* ── Main ────────────────────────────────────────────────── */
+    main {
+      max-width: 1100px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem;
+    }
+    .section-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #6a6d70;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── Grid ────────────────────────────────────────────────── */
+    .tile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    /* ── Tile ────────────────────────────────────────────────── */
+    .tile {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.75rem 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: .75rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      border: 1.5px solid #e5e7ea;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+      cursor: pointer;
+    }
+    .tile:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0,112,242,.15);
+      border-color: #0070f2;
+    }
+    .tile:active {
+      transform: translateY(0);
+    }
+
+    .tile-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    .tile-icon.blue   { background: #e8f2ff; }
+    .tile-icon.green  { background: #e6f8f0; }
+    .tile-icon.orange { background: #fff4e6; }
+    .tile-icon.purple { background: #f3eeff; }
+    .tile-icon.teal   { background: #e6f7f8; }
+
+    .tile-title {
+      font-size: 1rem;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+    .tile-desc {
+      font-size: .8125rem;
+      color: #6a6d70;
+      line-height: 1.5;
+    }
+
+    /* ── Footer ─────────────────────────────────────────────── */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: .75rem;
+      color: #a8aaac;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-logo">ON</div>
+    <div class="header-text">
+      <h1>ONEE — Gestion des Courbes de Charge</h1>
+      <p>Portail de supervision et d'import des données électriques</p>
+    </div>
+  </header>
+
+  <main>
+    <p class="section-title">Applications disponibles</p>
+
+    <div class="tile-grid">
+
+      <a class="tile" href="import-fichier/webapp/index.html">
+        <div class="tile-icon blue">📥</div>
+        <div class="tile-title">Import de fichiers</div>
+        <div class="tile-desc">Importer des fichiers compteurs .prn et .xlsx</div>
+      </a>
+
+      <a class="tile" href="fia-management/webapp/index.html">
+        <div class="tile-icon green">📋</div>
+        <div class="tile-title">Fiches FIA</div>
+        <div class="tile-desc">Consulter les Fiches Information Appareil et leurs mesures</div>
+      </a>
+
+      <a class="tile" href="client-management/webapp/index.html">
+        <div class="tile-icon orange">🏢</div>
+        <div class="tile-title">Clients</div>
+        <div class="tile-desc">Gérer les clients Grands Comptes et leurs contrats</div>
+      </a>
+
+      <a class="tile" href="contrat-management/webapp/index.html">
+        <div class="tile-icon purple">📄</div>
+        <div class="tile-title">Contrats</div>
+        <div class="tile-desc">Consulter les contrats d'abonnement et leurs compteurs</div>
+      </a>
+
+      <a class="tile" href="compteur-management/webapp/index.html">
+        <div class="tile-icon teal">⚡</div>
+        <div class="tile-title">Compteurs</div>
+        <div class="tile-desc">Gérer les compteurs physiques et leurs fiches FIA</div>
+      </a>
+
+    </div>
+  </main>
+
+  <footer>ONEE &mdash; Prototype v1.0 &mdash; 2026</footer>
+
+</body>
+</html>

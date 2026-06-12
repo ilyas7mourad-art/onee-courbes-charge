@@ -1,0 +1,109 @@
+{
+  "_version": "1.59.0",
+
+  "sap.app": {
+    "id": "onee.courbes.contratmanagement",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": { "version": "0.0.1" },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v4/courbes/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+
+  "sap.ui": {
+    "technology": "UI5",
+    "icons": { "icon": "sap-icon://sales-document" },
+    "fullWidth": false,
+    "supportedThemes": ["sap_horizon"]
+  },
+
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.108.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.fe.core": {},
+        "sap.fe.templates": {}
+      }
+    },
+    "contentDensities": { "compact": true, "cozy": true },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "onee.courbes.contratmanagement.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      }
+    },
+    "routing": {
+      "config": {},
+      "routes": [
+        {
+          "pattern": ":?query:",
+          "name": "ContratList",
+          "target": "ContratList"
+        },
+        {
+          "pattern": "Contrat({key}):?query:",
+          "name": "ContratObjectPage",
+          "target": "ContratObjectPage"
+        }
+      ],
+      "targets": {
+        "ContratList": {
+          "type": "Component",
+          "id": "ContratList",
+          "name": "sap.fe.templates.ListReport",
+          "options": {
+            "settings": {
+              "entitySet": "Contrat",
+              "variantManagement": "Page",
+              "initialLoad": "Enabled",
+              "navigation": {
+                "Contrat": {
+                  "detail": { "route": "ContratObjectPage" }
+                }
+              }
+            }
+          }
+        },
+        "ContratObjectPage": {
+          "type": "Component",
+          "id": "ContratObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "entitySet": "Contrat",
+              "editableHeaderContent": false
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "sap.fiori": {
+    "registrationIds": [],
+    "archeType": "transactional"
+  }
+}
