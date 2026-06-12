@@ -5,18 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ONEE – FIA Management</title>
 
-  <!--
-    Bootstrap SAPUI5 en mode standalone (sans sap.ushell).
-    sap.ushell n'est PAS disponible sur le CDN public ui5.sap.com :
-    il fait partie de la couche BTP/FLP et doit être fourni par le
-    serveur de déploiement (SAP BTP, ABAP Fiori Launchpad, etc.).
-    Pour le développement local avec `cds watch`, on charge directement
-    le composant Fiori Elements via sap.m.ComponentContainer.
-  -->
   <script
     id="sap-ui-bootstrap"
     src="https://ui5.sap.com/resources/sap-ui-core.js"
-    data-sap-ui-libs="sap.m, sap.fe.templates, sap.fe.core"
+    data-sap-ui-libs="sap.m,sap.ui.core,sap.fe.templates"
     data-sap-ui-compatVersion="edge"
     data-sap-ui-async="true"
     data-sap-ui-frameOptions="allow"
@@ -26,16 +18,13 @@
 
   <script>
     sap.ui.require(
-      ["sap/ui/core/Core", "sap/m/ComponentContainer"],
-      function (Core, ComponentContainer) {
-        // Core.ready() résout quand toutes les libs déclarées sont chargées
-        Core.ready().then(function () {
-          new ComponentContainer({
-            name    : "onee.courbes.fiamanagement",
-            settings: { id: "onee.courbes.fiamanagement" },
-            async   : true
-          }).placeAt("content");
-        });
+      ["sap/ui/core/ComponentContainer"],
+      function (ComponentContainer) {
+        new ComponentContainer({
+          name    : "onee.courbes.fiamanagement",
+          settings: { id: "onee.courbes.fiamanagement" },
+          async   : true
+        }).placeAt("content");
       }
     );
   </script>
