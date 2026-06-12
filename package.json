@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@sap/cds-dk": "^9",
-    "sqlite3": "^5"
+    "@cap-js/sqlite": "^2.4.0"
   },
   "scripts": {
     "start": "cds-serve",

@@ -1,13 +1,12 @@
 using { onee.courbes as db } from '../db/schema';
 
 /**
- * Service principal — expose toutes les entités du modèle ONEE.
- * Les entités composées (Contrat, Compteur, MesureInterval, QualiteDonnee)
- * restent accessibles via navigation ET en accès direct pour les opérations CRUD.
+ * Service OData V4 principal — gestion des courbes de charge ONEE.
+ * Expose toutes les entités en projection directe.
  */
-service CourbesChargeService @(path: '/api/courbes') {
+service CourbesService @(path: '/odata/v4/courbes') {
 
-  // ── Référentiel ─────────────────────────────────────────────
+  // ── Référentiel ──────────────────────────────────────────────
   entity Client        as projection on db.Client;
   entity Contrat       as projection on db.Contrat;
   entity Compteur      as projection on db.Compteur;
