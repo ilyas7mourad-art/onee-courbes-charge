@@ -8,7 +8,6 @@
     "applicationVersion": { "version": "0.0.1" },
     "title": "{{appTitle}}",
     "description": "{{appDescription}}",
-    "sourceTemplate": { "id": "@sap/generator-fiori:lrop" },
     "dataSources": {
       "mainService": {
         "uri": "/odata/v4/courbes/",
@@ -18,21 +17,6 @@
           "odataVersion": "4.0"
         }
       }
-    },
-    "crossNavigation": {
-      "inbounds": {
-        "FIA-manage": {
-          "semanticObject": "FIA",
-          "action": "manage",
-          "title": "{{appTitle}}",
-          "subTitle": "{{appSubTitle}}",
-          "icon": "sap-icon://document-text",
-          "signature": {
-            "parameters": {},
-            "additionalParameters": "allowed"
-          }
-        }
-      }
     }
   },
 
@@ -40,16 +24,17 @@
     "technology": "UI5",
     "icons": { "icon": "sap-icon://document-text" },
     "fullWidth": false,
-    "supportedThemes": ["sap_horizon", "sap_fiori_3"]
+    "supportedThemes": ["sap_horizon"]
   },
 
   "sap.ui5": {
-    "flexEnabled": true,
+    "flexEnabled": false,
     "dependencies": {
       "minUI5Version": "1.108.0",
       "libs": {
         "sap.m": {},
         "sap.ui.core": {},
+        "sap.fe.core": {},
         "sap.fe.templates": {}
       }
     },
@@ -65,17 +50,13 @@
         "dataSource": "mainService",
         "preload": true,
         "settings": {
-          "synchronizationMode": "None",
-          "operationMode": "Server",
           "autoExpandSelect": true,
           "earlyRequests": true
         }
       }
     },
     "routing": {
-      "config": {
-        "routerClass": "sap.fe.core.routing.Router"
-      },
+      "config": {},
       "routes": [
         {
           "pattern": ":?query:",
