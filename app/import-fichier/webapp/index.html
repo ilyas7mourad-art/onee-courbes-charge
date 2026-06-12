@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONEE – Import de fichiers compteurs</title>
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    #content    { height: 100%; }
+  </style>
+  <script
+    id="sap-ui-bootstrap"
+    src="https://ui5.sap.com/resources/sap-ui-core.js"
+    data-sap-ui-libs="sap.m,sap.ui.core,sap.ui.unified"
+    data-sap-ui-compatVersion="edge"
+    data-sap-ui-async="true"
+    data-sap-ui-frameOptions="allow"
+    data-sap-ui-theme="sap_horizon"
+    data-sap-ui-resourceroots='{"onee.courbes.importfichier": "./"}'
+  ></script>
+  <script>
+    sap.ui.getCore().attachInit(function () {
+      "use strict";
+      sap.ui.require(["sap/ui/core/ComponentContainer"], function (ComponentContainer) {
+        new ComponentContainer({
+          name  : "onee.courbes.importfichier",
+          height: "100%",
+          async : true
+        }).placeAt("content");
+      });
+    });
+  </script>
+</head>
+<body class="sapUiBody">
+  <div id="content"></div>
+</body>
+</html>

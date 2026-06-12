@@ -27,4 +27,18 @@ service CourbesService @(path: '/odata/v4/courbes') {
   entity MesureInterval as projection on db.MesureInterval;
   entity QualiteDonnee  as projection on db.QualiteDonnee;
 
+  // ── Action d'import de fichier compteur ──────────────────────
+  action importerFichier(
+    compteurID    : UUID,
+    nomFichier    : String,
+    contenuBase64 : LargeString
+  ) returns {
+    fiaId         : UUID;
+    statut        : String;
+    formatDetecte : String;
+    nbLignes      : Integer;
+    nbAnomalies   : Integer;
+    message       : String;
+  };
+
 }

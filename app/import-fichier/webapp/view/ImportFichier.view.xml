@@ -1,0 +1,99 @@
+<mvc:View
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:unified="sap.ui.unified"
+    xmlns:core="sap.ui.core"
+    controllerName="onee.courbes.importfichier.controller.ImportFichier"
+    displayBlock="true">
+
+    <App>
+        <Page title="Import de fichiers compteurs" showNavButton="false">
+            <content>
+                <ScrollContainer horizontal="false" vertical="true" height="100%">
+                    <VBox class="sapUiMediumMargin">
+
+                        <Panel headerText="Fichier à importer" class="sapUiMediumMarginBottom">
+                            <content>
+                                <VBox class="sapUiSmallMargin">
+
+                                    <Label text="Compteur" required="true"
+                                        class="sapUiSmallMarginBottom"/>
+                                    <ComboBox
+                                        id="cmbCompteur"
+                                        width="100%"
+                                        placeholder="Sélectionnez un compteur..."
+                                        selectionChange=".onCompteurChange"
+                                        items="{/Compteur}">
+                                        <core:ListItem
+                                            key="{ID}"
+                                            text="{meterID}"
+                                            additionalText="{localisation}"/>
+                                    </ComboBox>
+
+                                    <Label text="Fichier (.prn ou .xlsx)" required="true"
+                                        class="sapUiMediumMarginTop sapUiSmallMarginBottom"/>
+                                    <unified:FileUploader
+                                        id="fileUploader"
+                                        width="100%"
+                                        fileType="prn,xlsx"
+                                        uploadOnChange="false"
+                                        change=".onFileChange"
+                                        placeholder="Choisir un fichier .prn ou .xlsx"
+                                        name="importFile"/>
+                                    <ObjectStatus
+                                        id="formatBadge"
+                                        visible="false"
+                                        showStateIcon="true"
+                                        class="sapUiSmallMarginTop"/>
+
+                                </VBox>
+                            </content>
+                        </Panel>
+
+                        <Button
+                            id="btnImport"
+                            text="Importer"
+                            type="Emphasized"
+                            enabled="false"
+                            press=".onImport"
+                            class="sapUiMediumMarginBottom"/>
+
+                        <Panel
+                            id="panelResultat"
+                            headerText="Résultats de l'import"
+                            visible="false">
+                            <content>
+                                <VBox class="sapUiSmallMargin">
+                                    <MessageStrip
+                                        id="msgStrip"
+                                        text=" "
+                                        type="Success"
+                                        showIcon="true"
+                                        showCloseButton="false"
+                                        class="sapUiSmallMarginBottom"/>
+                                    <HBox class="sapUiSmallMarginBottom">
+                                        <Label text="Format détecté :" width="10rem"/>
+                                        <Text id="txtFormat"/>
+                                    </HBox>
+                                    <HBox class="sapUiSmallMarginBottom">
+                                        <Label text="Lignes importées :" width="10rem"/>
+                                        <Text id="txtNbLignes"/>
+                                    </HBox>
+                                    <HBox class="sapUiSmallMarginBottom">
+                                        <Label text="Anomalies :" width="10rem"/>
+                                        <Text id="txtNbAnomalies"/>
+                                    </HBox>
+                                    <HBox>
+                                        <Label text="Message :" width="10rem"/>
+                                        <Text id="txtMessage" wrapping="true"/>
+                                    </HBox>
+                                </VBox>
+                            </content>
+                        </Panel>
+
+                    </VBox>
+                </ScrollContainer>
+            </content>
+        </Page>
+    </App>
+</mvc:View>
