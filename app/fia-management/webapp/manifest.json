@@ -50,7 +50,6 @@
       "libs": {
         "sap.m": {},
         "sap.ui.core": {},
-        "sap.ushell": {},
         "sap.fe.templates": {}
       }
     },
