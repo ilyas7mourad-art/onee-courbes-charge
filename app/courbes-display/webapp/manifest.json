@@ -1,0 +1,108 @@
+{
+  "_version": "1.59.0",
+
+  "sap.app": {
+    "id": "onee.courbes.courbesdisplay",
+    "type": "application",
+    "i18n": "i18n/i18n.properties",
+    "applicationVersion": { "version": "0.0.1" },
+    "title": "{{appTitle}}",
+    "description": "{{appDescription}}",
+    "dataSources": {
+      "mainService": {
+        "uri": "/odata/v4/courbes/",
+        "type": "OData",
+        "settings": {
+          "annotations": [],
+          "odataVersion": "4.0"
+        }
+      }
+    }
+  },
+
+  "sap.ui": {
+    "technology": "UI5",
+    "fullWidth": false,
+    "supportedThemes": ["sap_horizon"]
+  },
+
+  "sap.ui5": {
+    "flexEnabled": false,
+    "dependencies": {
+      "minUI5Version": "1.108.0",
+      "libs": {
+        "sap.m": {},
+        "sap.ui.core": {},
+        "sap.fe.core": {},
+        "sap.fe.templates": {}
+      }
+    },
+    "contentDensities": { "compact": true, "cozy": true },
+    "models": {
+      "i18n": {
+        "type": "sap.ui.model.resource.ResourceModel",
+        "settings": {
+          "bundleName": "onee.courbes.courbesdisplay.i18n.i18n"
+        }
+      },
+      "": {
+        "dataSource": "mainService",
+        "preload": true,
+        "settings": {
+          "autoExpandSelect": true,
+          "earlyRequests": true
+        }
+      }
+    },
+    "routing": {
+      "config": {},
+      "routes": [
+        {
+          "pattern": ":?query:",
+          "name": "CourbesDisplayList",
+          "target": "CourbesDisplayList"
+        },
+        {
+          "pattern": "ZccCourbeChargesIndexs({key}):?query:",
+          "name": "CourbesDisplayObjectPage",
+          "target": "CourbesDisplayObjectPage"
+        }
+      ],
+      "targets": {
+        "CourbesDisplayList": {
+          "type": "Component",
+          "id": "CourbesDisplayList",
+          "name": "sap.fe.templates.ListReport",
+          "options": {
+            "settings": {
+              "entitySet": "ZccCourbeChargesIndexs",
+              "variantManagement": "Page",
+              "initialLoad": "Enabled",
+              "navigation": {
+                "ZccCourbeChargesIndexs": {
+                  "detail": { "route": "CourbesDisplayObjectPage" }
+                }
+              }
+            }
+          }
+        },
+        "CourbesDisplayObjectPage": {
+          "type": "Component",
+          "id": "CourbesDisplayObjectPage",
+          "name": "sap.fe.templates.ObjectPage",
+          "options": {
+            "settings": {
+              "entitySet": "ZccCourbeChargesIndexs",
+              "editableHeaderContent": false
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "sap.fiori": {
+    "registrationIds": [],
+    "archeType": "transactional"
+  }
+}
