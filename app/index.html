@@ -8,178 +8,189 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-      font-family: "72", "72full", Arial, Helvetica, sans-serif;
-      background: #f5f6f7;
-      color: #32363a;
+      font-family: "72", "72full", Arial, sans-serif;
+      background: #F5F6F7;
+      color: #1D2D3E;
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* ── Header ─────────────────────────────────────────────── */
-    header {
-      background: linear-gradient(135deg, #003d85 0%, #0070f2 100%);
-      color: #fff;
-      padding: 2rem 2.5rem;
+    /* ── Shell Header ───────────────────────────────────────── */
+    .shell-header {
+      background: #FFFFFF;
+      border-bottom: 1px solid #D9D9D9;
+      height: 3rem;
       display: flex;
       align-items: center;
-      gap: 1.25rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,.25);
-    }
-    .header-logo {
-      width: 48px;
-      height: 48px;
-      background: rgba(255,255,255,.15);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-      font-weight: 700;
-      letter-spacing: -1px;
+      padding: 0 1.5rem;
+      gap: 1rem;
       flex-shrink: 0;
     }
-    .header-text h1 {
-      font-size: 1.5rem;
+
+    .shell-brand {
+      font-size: .9375rem;
       font-weight: 700;
-      line-height: 1.2;
+      color: #1D2D3E;
+      letter-spacing: .01em;
+      white-space: nowrap;
     }
-    .header-text p {
+
+    .shell-divider {
+      width: 1px;
+      height: 1.125rem;
+      background: #D9D9D9;
+      flex-shrink: 0;
+    }
+
+    .shell-subtitle {
       font-size: .875rem;
-      opacity: .8;
-      margin-top: .25rem;
+      font-weight: 400;
+      color: #556B82;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    /* ── Main ────────────────────────────────────────────────── */
+    /* ── Main Content ───────────────────────────────────────── */
     main {
-      max-width: 1100px;
-      margin: 2.5rem auto;
-      padding: 0 1.5rem;
+      flex: 1;
+      padding: 2rem 2rem 0;
+      max-width: 1280px;
+      width: 100%;
+      margin: 0 auto;
     }
-    .section-title {
-      font-size: 1rem;
-      font-weight: 600;
-      color: #6a6d70;
+
+    .section-label {
+      font-size: .6875rem;
+      font-weight: 700;
+      color: #556B82;
       text-transform: uppercase;
-      letter-spacing: .08em;
-      margin-bottom: 1.25rem;
+      letter-spacing: .1em;
+      margin-bottom: 1rem;
     }
 
-    /* ── Grid ────────────────────────────────────────────────── */
+    /* ── Tile Grid ──────────────────────────────────────────── */
     .tile-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
     }
 
-    /* ── Tile ────────────────────────────────────────────────── */
+    /* ── Tile ───────────────────────────────────────────────── */
     .tile {
-      background: #fff;
-      border-radius: 12px;
-      padding: 1.75rem 1.5rem;
+      width: 11rem;
+      height: 11rem;
+      background: #FFFFFF;
+      border: 1px solid #E5E5E5;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+      padding: 1.25rem 1rem 1rem;
       text-decoration: none;
       color: inherit;
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
-      gap: .75rem;
-      box-shadow: 0 1px 4px rgba(0,0,0,.08);
-      border: 1.5px solid #e5e7ea;
-      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+      justify-content: flex-end;
+      transition:
+        border-color .14s ease,
+        box-shadow .14s ease;
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
     }
+
+    .tile::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: transparent;
+      transition: background .14s ease;
+    }
+
     .tile:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0,112,242,.15);
-      border-color: #0070f2;
-    }
-    .tile:active {
-      transform: translateY(0);
+      border-color: #0070F2;
+      box-shadow: 0 4px 12px rgba(0, 112, 242, .12);
     }
 
-    .tile-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
+    .tile:hover::before {
+      background: #0070F2;
     }
 
-    .tile-icon.blue   { background: #e8f2ff; }
-    .tile-icon.green  { background: #e6f8f0; }
-    .tile-icon.orange { background: #fff4e6; }
-    .tile-icon.purple { background: #f3eeff; }
-    .tile-icon.teal   { background: #e6f7f8; }
+    .tile:focus-visible {
+      outline: 2px solid #0070F2;
+      outline-offset: 2px;
+    }
 
     .tile-title {
-      font-size: 1rem;
+      font-size: .9375rem;
       font-weight: 600;
+      color: #1D2D3E;
       line-height: 1.3;
+      margin-bottom: .375rem;
     }
+
     .tile-desc {
-      font-size: .8125rem;
-      color: #6a6d70;
-      line-height: 1.5;
+      font-size: .75rem;
+      color: #556B82;
+      line-height: 1.45;
     }
 
     /* ── Footer ─────────────────────────────────────────────── */
     footer {
+      margin-top: auto;
+      padding: 1.5rem 2rem;
       text-align: center;
-      padding: 2rem;
-      font-size: .75rem;
-      color: #a8aaac;
+      font-size: .6875rem;
+      color: #A8B0B8;
+      letter-spacing: .02em;
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-logo">ON</div>
-    <div class="header-text">
-      <h1>ONEE — Gestion des Courbes de Charge</h1>
-      <p>Portail de supervision et d'import des données électriques</p>
-    </div>
+  <header class="shell-header">
+    <span class="shell-brand">ONEE</span>
+    <span class="shell-divider" aria-hidden="true"></span>
+    <span class="shell-subtitle">Gestion des Courbes de Charge</span>
   </header>
 
   <main>
-    <p class="section-title">Applications disponibles</p>
+    <p class="section-label">Applications</p>
 
     <div class="tile-grid">
 
       <a class="tile" href="import-fichier/webapp/index.html">
-        <div class="tile-icon blue">📥</div>
         <div class="tile-title">Import de fichiers</div>
         <div class="tile-desc">Importer des fichiers compteurs .prn et .xlsx</div>
       </a>
 
       <a class="tile" href="fia-management/webapp/index.html">
-        <div class="tile-icon green">📋</div>
         <div class="tile-title">Fiches FIA</div>
-        <div class="tile-desc">Consulter les Fiches Information Appareil et leurs mesures</div>
+        <div class="tile-desc">Fiches Information Appareil et mesures associées</div>
       </a>
 
       <a class="tile" href="client-management/webapp/index.html">
-        <div class="tile-icon orange">🏢</div>
         <div class="tile-title">Clients</div>
-        <div class="tile-desc">Gérer les clients Grands Comptes et leurs contrats</div>
+        <div class="tile-desc">Clients Grands Comptes et leurs contrats</div>
       </a>
 
       <a class="tile" href="contrat-management/webapp/index.html">
-        <div class="tile-icon purple">📄</div>
         <div class="tile-title">Contrats</div>
-        <div class="tile-desc">Consulter les contrats d'abonnement et leurs compteurs</div>
+        <div class="tile-desc">Contrats d'abonnement et compteurs rattachés</div>
       </a>
 
       <a class="tile" href="compteur-management/webapp/index.html">
-        <div class="tile-icon teal">⚡</div>
         <div class="tile-title">Compteurs</div>
-        <div class="tile-desc">Gérer les compteurs physiques et leurs fiches FIA</div>
+        <div class="tile-desc">Compteurs physiques et fiches FIA associées</div>
       </a>
 
     </div>
   </main>
 
-  <footer>ONEE &mdash; Prototype v1.0 &mdash; 2026</footer>
+  <footer>Office National de l&rsquo;Électricité et de l&rsquo;Eau Potable &mdash; DSI</footer>
 
 </body>
 </html>
