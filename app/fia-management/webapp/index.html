@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>ONEE – FIA Management</title>
 
+  <style>
+    html, body, #content { height: 100%; margin: 0; }
+  </style>
+
   <script
     id="sap-ui-bootstrap"
     src="https://ui5.sap.com/resources/sap-ui-core.js"
@@ -21,9 +25,9 @@
       ["sap/ui/core/ComponentContainer"],
       function (ComponentContainer) {
         new ComponentContainer({
-          name    : "onee.courbes.fiamanagement",
-          settings: { id: "onee.courbes.fiamanagement" },
-          async   : true
+          name  : "onee.courbes.fiamanagement",
+          height: "100%",
+          async : true
         }).placeAt("content");
       }
     );
