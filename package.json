@@ -1,0 +1,34 @@
+{
+  "name": "onee-courbes-charge",
+  "version": "1.0.0",
+  "description": "Application de gestion des courbes de charge électriques - ONEE",
+  "repository": "<Add your repository here>",
+  "license": "UNLICENSED",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@sap/cds": "^9"
+  },
+  "devDependencies": {
+    "@sap/cds-dk": "^9",
+    "sqlite3": "^5"
+  },
+  "scripts": {
+    "start": "cds-serve",
+    "watch": "cds watch",
+    "build": "cds build/all",
+    "test": "jest"
+  },
+  "cds": {
+    "requires": {
+      "db": {
+        "kind": "sqlite",
+        "credentials": {
+          "database": ":memory:"
+        }
+      }
+    }
+  }
+}
