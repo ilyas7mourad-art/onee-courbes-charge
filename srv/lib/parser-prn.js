@@ -7,6 +7,19 @@
  *   kWh-Del   → COD_CADRAN = 'EA'  (énergie active importée)
  *   kVARh-Del → COD_CADRAN = 'ER'  (énergie réactive importée)
  *
+ * ⚠ MAPPING PROVISOIRE — à revoir avec le vrai fichier ELSTER ONEE.
+ *   Le référentiel cadrans actuel contient PAIHP/PAIHC/PAIHPL (tranches
+ *   horaires tarifaires), pas des types d'énergie (EA/ER).
+ *   Deux options à trancher avec l'équipe :
+ *     A) Les relevés bruts gardent un code type d'énergie (EA/ER) → le
+ *        référentiel ZccCadrans doit alors inclure EA et ER.
+ *     B) Les relevés bruts sont directement rattachés à la tranche horaire
+ *        (PAIHP/PAIHC/PAIHPL) → ce parser doit appeler getTranche() pour
+ *        déterminer le COD_CADRAN à partir de la date+heure du relevé.
+ *   En attendant, le calcul Pmax (calcul-pmax.js) fonctionne correctement
+ *   car il reclasse chaque relevé par tranche via getTranche(), indépendamment
+ *   du COD_CADRAN stocké dans ZccCourbeChargesIndexs.
+ *
  * Each raw data line produces 2 ZccCourbeChargesIndexs entries.
  *
  * @param {string} texte  — file content decoded as latin1
