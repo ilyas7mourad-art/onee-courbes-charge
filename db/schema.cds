@@ -55,4 +55,10 @@ entity ZccCourbeChargesCalculed {
   AEZET                 : Time;
   STATUT                : String(1);
   MESSAGE               : String(220);
+  serge                 : String(20);    // numéro de série compteur (NSF)
+  codCadran             : String(10);    // PAIHP / PAIHC / PAIHPL
+  pmax                  : Decimal(15,3); // puissance maximale en kW
+  datePmax              : Date;          // date d'atteinte du Pmax
+  heurePmax             : Time;          // heure d'atteinte du Pmax
+  saison                : String(10);    // HIVER / ETE
 }

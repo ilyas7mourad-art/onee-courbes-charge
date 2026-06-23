@@ -143,49 +143,57 @@ annotate CourbesService.ZccCadrans with @(
 );
 
 // ═══════════════════════════════════════════════════════════════
-//  ZccCourbeChargesCalculed — résultats calculés
+//  ZccCourbeChargesCalculed — puissances maximales par tranche
 // ═══════════════════════════════════════════════════════════════
 annotate CourbesService.ZccCourbeChargesCalculed with @(
 
   UI.HeaderInfo: {
-    TypeName      : 'Résultat calculé',
-    TypeNamePlural: 'Résultats calculés',
-    Title      : { $Type: 'UI.DataField', Value: CLE_METIER        },
-    Description: { $Type: 'UI.DataField', Value: CHAMPS_AGREGATION }
+    TypeName      : 'Puissance maximale',
+    TypeNamePlural: 'Puissances maximales par tranche',
+    Title      : { $Type: 'UI.DataField', Value: serge     },
+    Description: { $Type: 'UI.DataField', Value: codCadran }
   },
 
-  UI.SelectionFields: [ CLE_METIER, STATUT ],
+  UI.SelectionFields: [ serge, codCadran, saison ],
 
   UI.LineItem: [
-    { $Type: 'UI.DataField', Value: CLE_METIER,        Label: 'Clé métier'        },
-    { $Type: 'UI.DataField', Value: CHAMPS_AGREGATION, Label: 'Champs agrégation' },
+    { $Type: 'UI.DataField', Value: serge,     Label: 'Compteur (NSF)' },
+    { $Type: 'UI.DataField', Value: codCadran, Label: 'Tranche'        },
+    { $Type: 'UI.DataField', Value: pmax,      Label: 'Pmax (kW)'      },
+    { $Type: 'UI.DataField', Value: datePmax,  Label: 'Date'           },
+    { $Type: 'UI.DataField', Value: heurePmax, Label: 'Heure'          },
+    { $Type: 'UI.DataField', Value: saison,    Label: 'Saison'         },
     {
       $Type      : 'UI.DataField',
       Value      : STATUT,
       Label      : 'Statut',
       Criticality: statutCriticality
-    },
-    { $Type: 'UI.DataField', Value: MESSAGE, Label: 'Message' }
+    }
   ],
 
-  UI.FieldGroup #InfoCalcul: {
+  UI.FieldGroup #InfoPmax: {
     $Type: 'UI.FieldGroupType',
-    Label: 'Résultat calculé',
+    Label: 'Puissance maximale',
     Data : [
-      { $Type: 'UI.DataField', Value: MANDT,             Label: 'Mandant'           },
-      { $Type: 'UI.DataField', Value: CLE_METIER,        Label: 'Clé métier'        },
-      { $Type: 'UI.DataField', Value: CHAMPS_AGREGATION, Label: 'Champs agrégation' },
+      { $Type: 'UI.DataField', Value: serge,     Label: 'Compteur (NSF)'  },
+      { $Type: 'UI.DataField', Value: codCadran, Label: 'Tranche'         },
+      { $Type: 'UI.DataField', Value: pmax,      Label: 'Pmax (kW)'       },
+      { $Type: 'UI.DataField', Value: datePmax,  Label: 'Date du Pmax'    },
+      { $Type: 'UI.DataField', Value: heurePmax, Label: 'Heure du Pmax'   },
+      { $Type: 'UI.DataField', Value: saison,    Label: 'Saison'          },
       {
         $Type      : 'UI.DataField',
         Value      : STATUT,
         Label      : 'Statut',
         Criticality: statutCriticality
       },
-      { $Type: 'UI.DataField', Value: MESSAGE, Label: 'Message' }
+      { $Type: 'UI.DataField', Value: MESSAGE,           Label: 'Message'          },
+      { $Type: 'UI.DataField', Value: CLE_METIER,        Label: 'Clé métier'       },
+      { $Type: 'UI.DataField', Value: CHAMPS_AGREGATION, Label: 'Champs agrégation'}
     ]
   },
 
-  UI.FieldGroup #AuditCalcul: {
+  UI.FieldGroup #AuditPmax: {
     $Type: 'UI.FieldGroupType',
     Label: 'Audit',
     Data : [
@@ -201,15 +209,15 @@ annotate CourbesService.ZccCourbeChargesCalculed with @(
   UI.Facets: [
     {
       $Type : 'UI.ReferenceFacet',
-      ID    : 'InfoCalculFacet',
-      Label : 'Résultat calculé',
-      Target: '@UI.FieldGroup#InfoCalcul'
+      ID    : 'InfoPmaxFacet',
+      Label : 'Puissance maximale',
+      Target: '@UI.FieldGroup#InfoPmax'
     },
     {
       $Type : 'UI.ReferenceFacet',
-      ID    : 'AuditCalculFacet',
+      ID    : 'AuditPmaxFacet',
       Label : 'Audit',
-      Target: '@UI.FieldGroup#AuditCalcul'
+      Target: '@UI.FieldGroup#AuditPmax'
     }
   ]
 );

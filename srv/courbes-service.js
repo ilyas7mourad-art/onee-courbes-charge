@@ -102,7 +102,13 @@ module.exports = cds.service.impl(async function (srv) {
                         ERZET             : erzet,
                         AENAM             : 'CALCUL',
                         AEDAT             : erdat,
-                        AEZET             : erzet
+                        AEZET             : erzet,
+                        serge             : r.serge,
+                        codCadran         : r.codCadran,
+                        pmax              : r.pmax,
+                        datePmax          : r.datePmax,
+                        heurePmax         : r.heurePmax,
+                        saison            : r.saison
                     }
                 })
                 await db.run(UPSERT.into('onee.courbes.ZccCourbeChargesCalculed').entries(pmaxRows))

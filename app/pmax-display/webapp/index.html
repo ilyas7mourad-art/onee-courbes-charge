@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONEE – Puissances maximales par tranche</title>
+  <style>
+    html, body { height: 100%; margin: 0; padding: 0; }
+    #content    { height: 100%; }
+  </style>
+  <script
+    id="sap-ui-bootstrap"
+    src="https://ui5.sap.com/resources/sap-ui-core.js"
+    data-sap-ui-libs="sap.m,sap.ui.core,sap.fe.core,sap.fe.templates"
+    data-sap-ui-compatVersion="edge"
+    data-sap-ui-async="true"
+    data-sap-ui-frameOptions="allow"
+    data-sap-ui-theme="sap_horizon"
+    data-sap-ui-resourceroots='{"onee.courbes.pmaxdisplay": "./"}'
+  ></script>
+  <script>
+    sap.ui.getCore().attachInit(function () {
+      "use strict";
+      sap.ui.require(["sap/ui/core/ComponentContainer"], function (ComponentContainer) {
+        new ComponentContainer({
+          name  : "onee.courbes.pmaxdisplay",
+          height: "100%",
+          async : true
+        }).placeAt("content");
+      });
+    });
+  </script>
+</head>
+<body class="sapUiBody">
+  <div id="content"></div>
+</body>
+</html>
