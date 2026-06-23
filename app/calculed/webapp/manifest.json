@@ -76,7 +76,7 @@
           "options": {
             "settings": {
               "entitySet": "ZccCourbeChargesCalculed",
-              "variantManagement": "Page",
+              "variantManagement": "None",
               "initialLoad": "Enabled",
               "navigation": {
                 "ZccCourbeChargesCalculed": {

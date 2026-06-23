@@ -76,7 +76,7 @@
           "options": {
             "settings": {
               "entitySet": "ZccCadrans",
-              "variantManagement": "Page",
+              "variantManagement": "None",
               "initialLoad": "Enabled",
               "navigation": {
                 "ZccCadrans": {

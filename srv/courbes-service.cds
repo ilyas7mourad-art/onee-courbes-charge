@@ -35,12 +35,13 @@ service CourbesService @(path: '/odata/v4/courbes') {
     nomFichier    : String,
     contenuBase64 : LargeString
   ) returns {
-    cleMetier     : String;
-    statut        : String;
-    formatDetecte : String;
-    nbLignes      : Integer;
-    nbAnomalies   : Integer;
-    message       : String;
+    cleMetier       : String;
+    statut          : String;
+    formatDetecte   : String;
+    nbLignes        : Integer;
+    nbAnomalies     : Integer;
+    nbPmaxCalcules  : Integer;
+    message         : String;
   };
 
 }

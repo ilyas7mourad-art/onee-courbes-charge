@@ -76,7 +76,7 @@
           "options": {
             "settings": {
               "entitySet": "ZccCourbeChargesIndexs",
-              "variantManagement": "Page",
+              "variantManagement": "None",
               "initialLoad": "Enabled",
               "navigation": {
                 "ZccCourbeChargesIndexs": {
