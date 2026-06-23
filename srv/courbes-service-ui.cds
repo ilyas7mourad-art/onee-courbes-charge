@@ -143,6 +143,18 @@ annotate CourbesService.ZccCadrans with @(
 );
 
 // ═══════════════════════════════════════════════════════════════
+//  ZccCourbeChargesCalculed — libellés des propriétés (@Common.Label)
+// ═══════════════════════════════════════════════════════════════
+annotate CourbesService.ZccCourbeChargesCalculed with {
+  serge     @title: 'Compteur (NSF)';
+  codCadran @title: 'Tranche';
+  pmax      @title: 'Pmax (kW)';
+  datePmax  @title: 'Date';
+  heurePmax @title: 'Heure';
+  saison    @title: 'Saison';
+}
+
+// ═══════════════════════════════════════════════════════════════
 //  ZccCourbeChargesCalculed — puissances maximales par tranche
 // ═══════════════════════════════════════════════════════════════
 annotate CourbesService.ZccCourbeChargesCalculed with @(
