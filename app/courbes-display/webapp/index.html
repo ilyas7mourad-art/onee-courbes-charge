@@ -4,10 +4,81 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ONEE – Relevés courbes de charge</title>
+
+  <!-- Chart.js — sap.viz non disponible sur ui5.sap.com (CDN public) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
+
   <style>
-    html, body { height: 100%; margin: 0; padding: 0; }
-    #content    { height: 100%; }
+    html, body { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+
+    .page-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    /* ── Zone Fiori Elements (tableau + filtres) ─────────────────── */
+    #fe-section {
+      flex: 0 0 58vh;
+      min-height: 300px;
+      overflow: hidden;   /* le composant FE gère son propre scroll */
+      position: relative;
+    }
+    #content { height: 100%; }
+
+    /* ── Zone graphique ──────────────────────────────────────────── */
+    #chart-section {
+      flex: 1;
+      min-height: 220px;
+      background: #F0F2F3;
+      border-top: 2px solid #D9D9D9;
+      display: flex;
+      flex-direction: column;
+      padding: 6px 14px 8px;
+      overflow: hidden;
+    }
+
+    .chart-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+      margin-bottom: 5px;
+    }
+    .chart-toolbar .ct-label {
+      font-family: "72", Arial, sans-serif;
+      font-size: .8125rem;
+      font-weight: 700;
+      color: #1D2D3E;
+    }
+    .chart-toolbar select {
+      font-family: "72", Arial, sans-serif;
+      font-size: .8125rem;
+      padding: .25rem .5rem;
+      border: 1px solid #BABFC4;
+      border-radius: 4px;
+      background: #fff;
+      color: #1D2D3E;
+      cursor: pointer;
+    }
+    #chartStatus {
+      font-family: "72", Arial, sans-serif;
+      font-size: .75rem;
+      color: #556B82;
+    }
+
+    .chart-canvas-wrap {
+      flex: 1;
+      background: #fff;
+      border: 1px solid #E5E5E5;
+      border-radius: 6px;
+      padding: 6px 10px;
+      position: relative;
+      overflow: hidden;
+    }
   </style>
+
+  <!-- SAPUI5 — inchangé -->
   <script
     id="sap-ui-bootstrap"
     src="https://ui5.sap.com/resources/sap-ui-core.js"
@@ -32,6 +103,222 @@
   </script>
 </head>
 <body class="sapUiBody">
-  <div id="content"></div>
+  <div class="page-layout">
+
+    <!-- ── Tableau Fiori Elements ───────────────────────────── -->
+    <div id="fe-section">
+      <div id="content"></div>
+    </div>
+
+    <!-- ── Graphique courbe de charge ───────────────────────── -->
+    <div id="chart-section">
+      <div class="chart-toolbar">
+        <span class="ct-label">Courbe de charge :</span>
+        <select id="selSerge" title="Sélectionner un compteur">
+          <option value="">— Compteur (NSF) —</option>
+        </select>
+        <span id="chartStatus">Chargement…</span>
+      </div>
+      <div class="chart-canvas-wrap">
+        <canvas id="courbeChart"></canvas>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ================================================================
+    //  Graphique courbe de charge — Chart.js
+    //  Note : sap.viz (VizFrame) n'est pas disponible sur le CDN
+    //  public ui5.sap.com. Chart.js (jsDelivr) est utilisé à la place.
+    //  Le cadran EA est utilisé en priorité (mapping provisoire .prn).
+    // ================================================================
+
+    var _chart = null;
+
+    // ── Helpers ────────────────────────────────────────────────────
+
+    async function oget(url) {
+      var r = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    }
+
+    function fmt(date, time) {
+      if (!date || !time) return '?';
+      return date.slice(8,10) + '/' + date.slice(5,7) + ' ' + time.slice(0,5);
+    }
+
+    // ── Tente d'extraire un SERGE depuis le hash sap.fe ────────────
+    // sap.fe encode l'état des filtres en iAppState (base64) dans l'URL ;
+    // on cherche juste la valeur brute "SERGE=XXXXX" dans le hash si elle
+    // y apparaît en clair (dépend de la version du routeur FE).
+    function sergeFromHash() {
+      try {
+        var hash = decodeURIComponent(window.location.hash || '');
+        var m    = hash.match(/[?&]SERGE=([^&$'"\s]+)/);
+        return m ? m[1] : null;
+      } catch(e) { return null; }
+    }
+
+    // ── Chargement liste compteurs ──────────────────────────────────
+
+    async function loadSerges() {
+      var sel    = document.getElementById('selSerge');
+      var status = document.getElementById('chartStatus');
+      try {
+        var json   = await oget('/odata/v4/courbes/ZccCourbeChargesIndexs?$select=SERGE&$orderby=SERGE');
+        var seen   = {};
+        var serges = (json.value || [])
+          .map(function(r) { return r.SERGE; })
+          .filter(function(s) { return seen[s] ? false : (seen[s] = true); });
+
+        serges.forEach(function(s) {
+          var opt = document.createElement('option');
+          opt.value = opt.textContent = s;
+          sel.appendChild(opt);
+        });
+
+        if (!serges.length) {
+          status.textContent = 'Aucun relevé disponible.';
+          return;
+        }
+
+        // Priorité : SERGE dans le hash (filtre FE actif) ou 1er disponible
+        var active = sergeFromHash() || serges[0];
+        sel.value  = serges.indexOf(active) >= 0 ? active : serges[0];
+        loadChart(sel.value);
+
+      } catch(e) {
+        status.textContent = 'Erreur compteurs : ' + e.message;
+        console.error('[courbe-graphique]', e);
+      }
+    }
+
+    // ── Rendu du graphique pour un SERGE ───────────────────────────
+
+    async function loadChart(serge) {
+      if (!serge) return;
+      var status = document.getElementById('chartStatus');
+      status.textContent = 'Chargement…';
+      try {
+        var enc = encodeURIComponent(serge);
+
+        // 1. Relevés — cadran EA en priorité (mapping provisoire)
+        var data = await oget(
+          '/odata/v4/courbes/ZccCourbeChargesIndexs'
+          + '?$filter=SERGE%20eq%20%27' + enc + '%27%20and%20COD_CADRAN%20eq%20%27EA%27'
+          + '&$orderby=DAT_RELEVE,HEU_RELEVE&$select=DAT_RELEVE,HEU_RELEVE,VAL_CADRAN'
+        );
+        var releves = data.value || [];
+
+        if (!releves.length) {   // fallback : tous cadrans
+          data    = await oget(
+            '/odata/v4/courbes/ZccCourbeChargesIndexs'
+            + '?$filter=SERGE%20eq%20%27' + enc + '%27'
+            + '&$orderby=DAT_RELEVE,HEU_RELEVE&$select=DAT_RELEVE,HEU_RELEVE,VAL_CADRAN'
+          );
+          releves = data.value || [];
+        }
+
+        // 2. Pmax par tranche
+        data     = await oget(
+          '/odata/v4/courbes/ZccCourbeChargesCalculed'
+          + '?$filter=serge%20eq%20%27' + enc + '%27&$select=codCadran,pmax'
+        );
+        var pmax = {};
+        (data.value || []).forEach(function(p) { pmax[p.codCadran] = parseFloat(p.pmax) || null; });
+
+        // 3. Dataset Chart.js
+        var labels   = releves.map(function(r) { return fmt(r.DAT_RELEVE, r.HEU_RELEVE); });
+        var values   = releves.map(function(r) { return parseFloat(r.VAL_CADRAN) || 0; });
+        var n        = labels.length;
+        var datasets = [{
+          label          : 'Courbe de charge',
+          data           : values,
+          borderColor    : '#1F7BC0',
+          backgroundColor: 'rgba(31,123,192,0.07)',
+          borderWidth    : 2,
+          pointRadius    : 3,
+          tension        : 0.3,
+          fill           : true,
+          order          : 0
+        }];
+
+        [
+          { key: 'PAIHP',  label: 'Pmax PAIHP (Pointe)',  color: '#E84444' },
+          { key: 'PAIHC',  label: 'Pmax PAIHC (Creuse)',  color: '#5B9BD5' },
+          { key: 'PAIHPL', label: 'Pmax PAIHPL (Pleine)', color: '#2DAB65' }
+        ].forEach(function(def) {
+          if (pmax[def.key] == null) return;
+          datasets.push({
+            label      : def.label + ' = ' + pmax[def.key] + ' kW',
+            data       : Array(n).fill(pmax[def.key]),
+            borderColor: def.color,
+            borderWidth: 1.5,
+            borderDash : [6, 4],
+            pointRadius: 0,
+            fill       : false,
+            order      : 1
+          });
+        });
+
+        // 4. Rendu
+        var canvas = document.getElementById('courbeChart');
+        if (_chart) { _chart.destroy(); _chart = null; }
+        _chart = new Chart(canvas, {
+          type: 'line',
+          data: { labels: labels, datasets: datasets },
+          options: {
+            responsive         : true,
+            maintainAspectRatio: false,
+            animation          : { duration: 300 },
+            plugins: {
+              title : { display: true, text: 'Courbe de charge — ' + serge, font: { size: 13, weight: '600' } },
+              legend: { display: true },
+              tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+              x: { ticks: { maxTicksLimit: 16, maxRotation: 45 } },
+              y: { title: { display: true, text: 'kW' }, beginAtZero: false }
+            }
+          }
+        });
+
+        // 5. Statut
+        var pmaxParts = [];
+        ['PAIHP', 'PAIHC', 'PAIHPL'].forEach(function(k) {
+          if (pmax[k] != null) pmaxParts.push(k + ' = ' + pmax[k] + ' kW');
+        });
+        status.textContent = releves.length + ' relevé(s)'
+          + (pmaxParts.length ? ' — Pmax : ' + pmaxParts.join(' | ') : ' — Pmax non calculés');
+
+      } catch(e) {
+        status.textContent = 'Erreur : ' + e.message;
+        console.error('[courbe-graphique]', e);
+      }
+    }
+
+    // ── Écoute des changements de route FE (filtre SERGE) ──────────
+    window.addEventListener('hashchange', function() {
+      var s = sergeFromHash();
+      if (s) {
+        var sel = document.getElementById('selSerge');
+        if (sel.value !== s) { sel.value = s; loadChart(s); }
+      }
+    });
+
+    document.getElementById('selSerge').addEventListener('change', function() {
+      if (this.value) loadChart(this.value);
+    });
+
+    // ── Init ───────────────────────────────────────────────────────
+    if (typeof Chart === 'undefined') {
+      document.getElementById('chartStatus').textContent =
+        'Erreur : Chart.js non chargé (cdn.jsdelivr.net inaccessible ?)';
+    } else {
+      loadSerges();
+    }
+  </script>
 </body>
 </html>
