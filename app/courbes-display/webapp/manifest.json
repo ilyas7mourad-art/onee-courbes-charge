@@ -28,15 +28,6 @@
 
   "sap.ui5": {
     "flexEnabled": false,
-    "extends": {
-      "extensions": {
-        "sap.ui.controllerExtensions": {
-          "sap.fe.templates.ObjectPage.ObjectPageController": {
-            "controllerName": "onee.courbes.courbesdisplay.ext.chart.ObjectPageExt"
-          }
-        }
-      }
-    },
     "dependencies": {
       "minUI5Version": "1.108.0",
       "libs": {
@@ -102,21 +93,7 @@
           "options": {
             "settings": {
               "entitySet": "ZccCourbeChargesIndexs",
-              "editableHeaderContent": false,
-              "content": {
-                "body": {
-                  "sections": {
-                    "CourbeDeChargeSection": {
-                      "template": "onee.courbes.courbesdisplay.ext.chart.ChartSection",
-                      "title": "Courbe de charge",
-                      "position": {
-                        "placement": "After",
-                        "anchor": "AuditReleveFacet"
-                      }
-                    }
-                  }
-                }
-              }
+              "editableHeaderContent": false
             }
           }
         }
