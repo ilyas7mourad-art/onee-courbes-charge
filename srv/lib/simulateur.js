@@ -53,21 +53,42 @@ const PROFILS = {
 
 const PROFIL_LIST = ['industriel', 'tertiaire', 'mixte', 'residentiel']
 
-// ── 20 compteurs virtuels ────────────────────────────────────────────────────
-// Chaque compteur reçoit un profil (cyclé), une base et une amplitude
-// déterministes (pas de Math.random() pour assurer la reproductibilité).
+// Libellés "type de site" affichés dans l'interface (langage métier)
+const TYPE_SITE = {
+    industriel  : 'Industrie',
+    tertiaire   : 'Tertiaire',
+    mixte       : 'Commercial',
+    residentiel : 'Résidentiel'
+}
 
-const COMPTEURS = Array.from({ length: 20 }, (_, i) => {
-    const serge    = `SIM${String(i + 1).padStart(4, '0')}`
+// ── 20 numéros de série réalistes (format ELSTER 8 chiffres) ─────────────────
+// Bloc de production fictif issu d'une commande ONEE — numéros non séquentiels
+// pour refléter la réalité (lots de plusieurs fournisseurs, posés à des dates
+// différentes). NE PAS utiliser 02826294 (existant dans les données réelles).
+
+const SERGES_LIST = [
+    '29103475', '29841062', '30582749', '31107438', '31984056',
+    '32641897', '33205481', '33897264', '34481059', '35062781',
+    '35703194', '36248075', '36891423', '37502864', '38094517',
+    '38746290', '39203578', '39856142', '40417263', '41082934'
+]
+
+const COMPTEURS = SERGES_LIST.map((serge, i) => {
     const profilNom = PROFIL_LIST[i % PROFIL_LIST.length]
-    const profil   = PROFILS[profilNom]
+    const profil    = PROFILS[profilNom]
 
-    // Variance déterministe dans [0,1) sans aléatoire : hash linéaire de l'index
-    const t = (i * 7 + 3) / 20
+    // Variance déterministe dans [0,1) sans aléatoire
+    const t    = (i * 7 + 3) / 20
     const base = profil.baseMin + t * (profil.baseMax - profil.baseMin)
     const amp  = profil.ampMin  + t * (profil.ampMax  - profil.ampMin)
 
-    return { serge, profilNom, profil, base: Math.round(base * 100) / 100, amp: Math.round(amp * 100) / 100 }
+    return {
+        serge, profilNom,
+        typeSite: TYPE_SITE[profilNom],
+        profil,
+        base: Math.round(base * 100) / 100,
+        amp:  Math.round(amp  * 100) / 100
+    }
 })
 
 // ── Bruit déterministe ───────────────────────────────────────────────────────

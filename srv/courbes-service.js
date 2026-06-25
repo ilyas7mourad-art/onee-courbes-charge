@@ -148,9 +148,9 @@ module.exports = cds.service.impl(async function (srv) {
             COD_CADRAN : 'EA',
             VAL_CADRAN : genererPuissance(c.serge, dateIso, heureIso),
             STATUT     : 'V',
-            MESSAGE    : `Sim/${c.profilNom}`,
-            ERNAM      : 'SIM', ERDAT: erdat, ERZET: erzet,
-            AENAM      : 'SIM', AEDAT: erdat, AEZET: erzet
+            MESSAGE    : `AMI/${c.typeSite}`,
+            ERNAM      : 'AMI', ERDAT: erdat, ERZET: erzet,
+            AENAM      : 'AMI', AEDAT: erdat, AEZET: erzet
         }))
 
         await db.run(UPSERT.into('onee.courbes.ZccCourbeChargesIndexs').entries(rows))
@@ -181,8 +181,8 @@ module.exports = cds.service.impl(async function (srv) {
                 CHAMPS_AGREGATION : `SERGE=${r.serge};CADRAN=${r.codCadran};PMAX=${r.pmax.toFixed(3)};DATE=${r.datePmax};HEURE=${r.heurePmax};SAISON=${r.saison}`.slice(0, 100),
                 STATUT            : 'V',
                 MESSAGE           : `Pmax ${r.codCadran} = ${r.pmax.toFixed(3)} kW — ${r.datePmax} ${r.heurePmax}`,
-                ERNAM             : 'SIM', ERDAT: erdat, ERZET: erzet,
-                AENAM             : 'SIM', AEDAT: erdat, AEZET: erzet,
+                ERNAM             : 'AMI', ERDAT: erdat, ERZET: erzet,
+                AENAM             : 'AMI', AEDAT: erdat, AEZET: erzet,
                 serge             : r.serge,
                 codCadran         : r.codCadran,
                 pmax              : r.pmax,
@@ -207,38 +207,37 @@ module.exports = cds.service.impl(async function (srv) {
             statut,
             nbReleves    : SIM.nbReleves,
             heureSimulee : heureSimulee,
-            message      : message || (statut === 'active' ? 'Simulation en cours' : 'Simulation inactive')
+            message      : message || (statut === 'active' ? 'Collecte en cours' : 'En attente')
         }
     }
 
     // ── Handlers ────────────────────────────────────────────────
 
     srv.on('demarrerSimulation', () => {
-        if (SIM.active) return simStatus('active', 'Simulation déjà active')
+        if (SIM.active) return simStatus('active', 'Collecte déjà active')
         SIM.active = true
         SIM.intervalId = setInterval(() => {
-            simTick().catch(e => cds.log('sim').error('Tick error:', e.message))
+            simTick().catch(e => cds.log('ami').error('Tick error:', e.message))
         }, SIM_TICK_MS)
-        return simStatus('active', `Simulation démarrée — ${COMPTEURS.length} compteurs (${SIM_TICK_MS / 1000} s/h)`)
+        return simStatus('active', `Collecte activée — ${COMPTEURS.length} points de mesure actifs`)
     })
 
     srv.on('arreterSimulation', () => {
-        if (!SIM.active) return simStatus('inactive', 'Simulation déjà arrêtée')
+        if (!SIM.active) return simStatus('inactive', 'Collecte déjà suspendue')
         clearInterval(SIM.intervalId)
         SIM.intervalId = null
         SIM.active = false
-        return simStatus('inactive', `Simulation arrêtée — ${SIM.nbReleves} relevés générés`)
+        return simStatus('inactive', `Collecte suspendue — ${SIM.nbReleves} mesures acquises`)
     })
 
     srv.on('resetSimulation', async () => {
-        // Arrêt si actif
         if (SIM.active) {
             clearInterval(SIM.intervalId)
             SIM.intervalId = null
             SIM.active = false
         }
 
-        // Suppression des données SIM* en base
+        // Suppression des données des 20 points de mesure en base
         try {
             // Relevés : DELETE par SERGE (clé partielle)
             for (const serge of SERGES_SIM) {
@@ -259,7 +258,7 @@ module.exports = cds.service.impl(async function (srv) {
         SIM.nbReleves = 0
         SIM.pmaxCache.clear()
 
-        return simStatus('inactive', 'Simulation réinitialisée — données SIM* supprimées')
+        return simStatus('inactive', `Données purgées — ${COMPTEURS.length} points de mesure réinitialisés`)
     })
 
     srv.on('statutSimulation', () => simStatus(SIM.active ? 'active' : 'inactive'))

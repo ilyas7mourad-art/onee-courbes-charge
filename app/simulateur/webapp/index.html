@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ONEE – Simulateur temps réel</title>
+  <title>ONEE – Collecte automatique des compteurs</title>
   <link rel="stylesheet" href="/shared/nav.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -165,28 +165,24 @@
 <body>
 <div class="page">
 
-  <h1>Simulateur temps réel — 20 compteurs virtuels</h1>
+  <h1>Télérelevé AMI — Collecte automatique des compteurs</h1>
 
   <!-- ── Statut ───────────────────────────────────── -->
   <div class="card">
-    <div class="card-label">État</div>
+    <div class="card-label">État de la collecte</div>
     <div class="status-row">
       <span class="dot" id="dot"></span>
-      <span class="status-text" id="statusTxt">Inactive</span>
+      <span class="status-text" id="statusTxt">En attente</span>
       <span class="heure-sim" id="heureSim"></span>
     </div>
     <div class="metrics">
       <div>
         <div class="metric-val" id="nbReleves">0</div>
-        <div class="metric-lbl">Relevés générés</div>
+        <div class="metric-lbl">Mesures collectées</div>
       </div>
       <div>
         <div class="metric-val">20</div>
-        <div class="metric-lbl">Compteurs actifs</div>
-      </div>
-      <div>
-        <div class="metric-val">1 h / 2 s</div>
-        <div class="metric-lbl">Vitesse de simulation</div>
+        <div class="metric-lbl">Points de mesure</div>
       </div>
     </div>
   </div>
@@ -195,32 +191,26 @@
   <div class="card">
     <div class="card-label">Contrôles</div>
     <div class="btn-row">
-      <button class="btn btn-start" id="btnStart" onclick="demarrer()">Démarrer</button>
-      <button class="btn btn-stop"  id="btnStop"  onclick="arreter()"  disabled>Arrêter</button>
-      <button class="btn btn-reset" id="btnReset" onclick="reset()">Réinitialiser</button>
+      <button class="btn btn-start" id="btnStart" onclick="demarrer()">Activer la collecte</button>
+      <button class="btn btn-stop"  id="btnStop"  onclick="arreter()"  disabled>Suspendre</button>
+      <button class="btn btn-reset" id="btnReset" onclick="reset()">Purger les données</button>
     </div>
     <div id="log"></div>
   </div>
 
-  <!-- ── Compteurs ────────────────────────────────── -->
+  <!-- ── Points de mesure ─────────────────────────── -->
   <div class="card">
-    <div class="card-label">Compteurs virtuels</div>
+    <div class="card-label">Points de mesure télérelevés</div>
     <div class="meter-grid" id="meterGrid"></div>
   </div>
 
-  <!-- ── Info ─────────────────────────────────────── -->
+  <!-- ── Liens rapides ────────────────────────────── -->
   <div class="card">
-    <div class="card-label">Mode d'emploi</div>
+    <div class="card-label">Accès direct</div>
     <p class="info">
-      Chaque <strong>tick de 2 secondes</strong> représente <strong>1 heure simulée</strong> (début : 2024-01-15 00:00 HIVER).<br>
-      20 relevés cadran EA (un par compteur) sont insérés en base à chaque tick — avec contrôle qualité et recalcul Pmax.<br><br>
-      <strong>Profils disponibles :</strong>
-      Industriel (SIM0001, 05, 09, 13, 17) · Tertiaire/bureau (SIM0002, 06, 10, 14, 18) ·
-      Mixte (SIM0003, 07, 11, 15, 19) · Résidentiel agrégé (SIM0004, 08, 12, 16, 20).<br><br>
-      <strong>Voir en direct :</strong>
+      <strong>Consulter les données collectées :</strong>
       <a href="/courbes-display/webapp/index.html">Relevés</a> ·
-      <a href="/pmax-display/webapp/index.html">Puissances max</a> ·
-      Graphique de détail d'un compteur SIM → courbe réaliste (creux nuit, pic soir/bureaux).
+      <a href="/pmax-display/webapp/index.html">Puissances maximales</a>
     </p>
   </div>
 
@@ -233,29 +223,38 @@
   var BASE = '/odata/v4/courbes';
   var pollId = null;
 
-  // ── Build meter chips ──────────────────────────────────────
-  var PROFIL_MAP = {
-    industriel: [1,5,9,13,17],
-    tertiaire:  [2,6,10,14,18],
-    mixte:      [3,7,11,15,19],
-    residentiel:[4,8,12,16,20]
-  };
-  var meterProfil = {};
-  Object.keys(PROFIL_MAP).forEach(function(p) {
-    PROFIL_MAP[p].forEach(function(n) {
-      meterProfil['SIM' + String(n).padStart(4,'0')] = p;
-    });
-  });
+  // ── Points de mesure (numéros de série ELSTER + type de site) ─────────
+  var METERS = [
+    { serge: '29103475', site: 'Industrie'   },
+    { serge: '29841062', site: 'Tertiaire'   },
+    { serge: '30582749', site: 'Commercial'  },
+    { serge: '31107438', site: 'Résidentiel' },
+    { serge: '31984056', site: 'Industrie'   },
+    { serge: '32641897', site: 'Tertiaire'   },
+    { serge: '33205481', site: 'Commercial'  },
+    { serge: '33897264', site: 'Résidentiel' },
+    { serge: '34481059', site: 'Industrie'   },
+    { serge: '35062781', site: 'Tertiaire'   },
+    { serge: '35703194', site: 'Commercial'  },
+    { serge: '36248075', site: 'Résidentiel' },
+    { serge: '36891423', site: 'Industrie'   },
+    { serge: '37502864', site: 'Tertiaire'   },
+    { serge: '38094517', site: 'Commercial'  },
+    { serge: '38746290', site: 'Résidentiel' },
+    { serge: '39203578', site: 'Industrie'   },
+    { serge: '39856142', site: 'Tertiaire'   },
+    { serge: '40417263', site: 'Commercial'  },
+    { serge: '41082934', site: 'Résidentiel' }
+  ];
 
   var grid = document.getElementById('meterGrid');
-  for (var i = 1; i <= 20; i++) {
-    var s = 'SIM' + String(i).padStart(4,'0');
+  METERS.forEach(function(m) {
     var chip = document.createElement('span');
     chip.className = 'chip';
-    chip.id = 'chip-' + s;
-    chip.textContent = s + ' · ' + meterProfil[s];
+    chip.id = 'chip-' + m.serge;
+    chip.textContent = m.serge + ' · ' + m.site;
     grid.appendChild(chip);
-  }
+  });
 
   // ── Helpers ────────────────────────────────────────────────
   function log(msg, cls) {
@@ -270,16 +269,17 @@
   function updateUI(data) {
     var active = data.statut === 'active';
     document.getElementById('dot').className        = 'dot' + (active ? ' active' : '');
-    document.getElementById('statusTxt').textContent = active ? 'Active' : 'Inactive';
+    document.getElementById('statusTxt').textContent = active ? 'Collecte active' : 'En attente';
     document.getElementById('heureSim').textContent  =
       (data.heureSimulee && data.heureSimulee !== '--')
-        ? '· Heure simulée : ' + data.heureSimulee + ' (UTC)'
+        ? '· Dernière acquisition : ' + data.heureSimulee + ' (UTC)'
         : '';
     document.getElementById('nbReleves').textContent = (data.nbReleves || 0).toLocaleString('fr-FR');
     document.getElementById('btnStart').disabled = active;
     document.getElementById('btnStop').disabled  = !active;
-    document.querySelectorAll('.chip').forEach(function(c) {
-      c.className = 'chip' + (active ? ' active' : '');
+    METERS.forEach(function(m) {
+      var c = document.getElementById('chip-' + m.serge);
+      if (c) c.className = 'chip' + (active ? ' active' : '');
     });
   }
 
