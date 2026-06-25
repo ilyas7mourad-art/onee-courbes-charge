@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ONEE – Simulateur temps réel</title>
+  <link rel="stylesheet" href="/shared/nav.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "72", "72full", Arial, sans-serif;
+      background: #F5F6F7;
+      color: #1D2D3E;
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 1.75rem 1.5rem 3rem;
+    }
+
+    h1 {
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #1D2D3E;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── Cards ───────────────────────────────────────────── */
+    .card {
+      background: #fff;
+      border: 1px solid #E5E5E5;
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 1px 2px rgba(0,0,0,.05);
+    }
+
+    .card-label {
+      font-size: .6875rem;
+      font-weight: 700;
+      color: #556B82;
+      text-transform: uppercase;
+      letter-spacing: .1em;
+      margin-bottom: 1rem;
+    }
+
+    /* ── Statut ──────────────────────────────────────────── */
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: .875rem;
+      margin-bottom: .875rem;
+    }
+
+    .dot {
+      width: .625rem; height: .625rem;
+      border-radius: 50%;
+      background: #C8CDD4;
+      flex-shrink: 0;
+      transition: background .3s;
+    }
+    .dot.active { background: #2DAB65; box-shadow: 0 0 0 3px rgba(45,171,101,.2); }
+
+    .status-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #1D2D3E;
+    }
+
+    .heure-sim {
+      font-size: .8125rem;
+      color: #556B82;
+    }
+
+    /* ── Métriques ───────────────────────────────────────── */
+    .metrics {
+      display: flex;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+    }
+    .metric-val {
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #0070F2;
+      line-height: 1.1;
+    }
+    .metric-lbl {
+      font-size: .75rem;
+      color: #556B82;
+      margin-top: .2rem;
+    }
+
+    /* ── Boutons ─────────────────────────────────────────── */
+    .btn-row { display: flex; gap: .75rem; flex-wrap: wrap; }
+
+    .btn {
+      padding: .5rem 1.375rem;
+      border-radius: 4px;
+      border: 1.5px solid transparent;
+      font-family: inherit;
+      font-size: .875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .12s, border-color .12s, color .12s;
+    }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    .btn-start  { background: #0070F2; color: #fff; border-color: #0070F2; }
+    .btn-start:not(:disabled):hover  { background: #0062d9; }
+
+    .btn-stop   { background: #fff; color: #0070F2; border-color: #0070F2; }
+    .btn-stop:not(:disabled):hover   { background: #EAF2FF; }
+
+    .btn-reset  { background: #fff; color: #E84444; border-color: #E84444; }
+    .btn-reset:not(:disabled):hover  { background: #FFF0F0; }
+
+    /* ── Journal ─────────────────────────────────────────── */
+    #log {
+      margin-top: .875rem;
+      max-height: 7rem;
+      overflow-y: auto;
+      font-size: .75rem;
+      font-family: monospace;
+      color: #556B82;
+    }
+    .log-line {
+      padding: .15rem 0;
+      border-bottom: 1px solid #F3F3F3;
+    }
+    .log-line.ok  { color: #2DAB65; }
+    .log-line.err { color: #E84444; }
+
+    /* ── Compteurs ───────────────────────────────────────── */
+    .meter-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .4rem;
+    }
+    .chip {
+      padding: .25rem .6rem;
+      border-radius: 99px;
+      font-size: .6875rem;
+      font-weight: 600;
+      border: 1px solid #E5E5E5;
+      background: #F5F6F7;
+      color: #556B82;
+      transition: background .2s, color .2s, border-color .2s;
+      white-space: nowrap;
+    }
+    .chip.active {
+      background: #EAF4FF;
+      color: #0070F2;
+      border-color: #A0C8F8;
+    }
+
+    /* ── Info ────────────────────────────────────────────── */
+    .info { font-size: .8125rem; color: #556B82; line-height: 1.6; }
+    .info strong { color: #1D2D3E; }
+  </style>
+  <script src="/shared/nav.js"></script>
+</head>
+<body>
+<div class="page">
+
+  <h1>Simulateur temps réel — 20 compteurs virtuels</h1>
+
+  <!-- ── Statut ───────────────────────────────────── -->
+  <div class="card">
+    <div class="card-label">État</div>
+    <div class="status-row">
+      <span class="dot" id="dot"></span>
+      <span class="status-text" id="statusTxt">Inactive</span>
+      <span class="heure-sim" id="heureSim"></span>
+    </div>
+    <div class="metrics">
+      <div>
+        <div class="metric-val" id="nbReleves">0</div>
+        <div class="metric-lbl">Relevés générés</div>
+      </div>
+      <div>
+        <div class="metric-val">20</div>
+        <div class="metric-lbl">Compteurs actifs</div>
+      </div>
+      <div>
+        <div class="metric-val">1 h / 2 s</div>
+        <div class="metric-lbl">Vitesse de simulation</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Contrôles ────────────────────────────────── -->
+  <div class="card">
+    <div class="card-label">Contrôles</div>
+    <div class="btn-row">
+      <button class="btn btn-start" id="btnStart" onclick="demarrer()">Démarrer</button>
+      <button class="btn btn-stop"  id="btnStop"  onclick="arreter()"  disabled>Arrêter</button>
+      <button class="btn btn-reset" id="btnReset" onclick="reset()">Réinitialiser</button>
+    </div>
+    <div id="log"></div>
+  </div>
+
+  <!-- ── Compteurs ────────────────────────────────── -->
+  <div class="card">
+    <div class="card-label">Compteurs virtuels</div>
+    <div class="meter-grid" id="meterGrid"></div>
+  </div>
+
+  <!-- ── Info ─────────────────────────────────────── -->
+  <div class="card">
+    <div class="card-label">Mode d'emploi</div>
+    <p class="info">
+      Chaque <strong>tick de 2 secondes</strong> représente <strong>1 heure simulée</strong> (début : 2024-01-15 00:00 HIVER).<br>
+      20 relevés cadran EA (un par compteur) sont insérés en base à chaque tick — avec contrôle qualité et recalcul Pmax.<br><br>
+      <strong>Profils disponibles :</strong>
+      Industriel (SIM0001, 05, 09, 13, 17) · Tertiaire/bureau (SIM0002, 06, 10, 14, 18) ·
+      Mixte (SIM0003, 07, 11, 15, 19) · Résidentiel agrégé (SIM0004, 08, 12, 16, 20).<br><br>
+      <strong>Voir en direct :</strong>
+      <a href="/courbes-display/webapp/index.html">Relevés</a> ·
+      <a href="/pmax-display/webapp/index.html">Puissances max</a> ·
+      Graphique de détail d'un compteur SIM → courbe réaliste (creux nuit, pic soir/bureaux).
+    </p>
+  </div>
+
+</div>
+
+<script>
+;(function () {
+  'use strict';
+
+  var BASE = '/odata/v4/courbes';
+  var pollId = null;
+
+  // ── Build meter chips ──────────────────────────────────────
+  var PROFIL_MAP = {
+    industriel: [1,5,9,13,17],
+    tertiaire:  [2,6,10,14,18],
+    mixte:      [3,7,11,15,19],
+    residentiel:[4,8,12,16,20]
+  };
+  var meterProfil = {};
+  Object.keys(PROFIL_MAP).forEach(function(p) {
+    PROFIL_MAP[p].forEach(function(n) {
+      meterProfil['SIM' + String(n).padStart(4,'0')] = p;
+    });
+  });
+
+  var grid = document.getElementById('meterGrid');
+  for (var i = 1; i <= 20; i++) {
+    var s = 'SIM' + String(i).padStart(4,'0');
+    var chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.id = 'chip-' + s;
+    chip.textContent = s + ' · ' + meterProfil[s];
+    grid.appendChild(chip);
+  }
+
+  // ── Helpers ────────────────────────────────────────────────
+  function log(msg, cls) {
+    var div = document.getElementById('log');
+    var line = document.createElement('div');
+    line.className = 'log-line' + (cls ? ' ' + cls : '');
+    line.textContent = new Date().toLocaleTimeString('fr-FR') + ' — ' + msg;
+    div.insertBefore(line, div.firstChild);
+    while (div.children.length > 30) div.removeChild(div.lastChild);
+  }
+
+  function updateUI(data) {
+    var active = data.statut === 'active';
+    document.getElementById('dot').className        = 'dot' + (active ? ' active' : '');
+    document.getElementById('statusTxt').textContent = active ? 'Active' : 'Inactive';
+    document.getElementById('heureSim').textContent  =
+      (data.heureSimulee && data.heureSimulee !== '--')
+        ? '· Heure simulée : ' + data.heureSimulee + ' (UTC)'
+        : '';
+    document.getElementById('nbReleves').textContent = (data.nbReleves || 0).toLocaleString('fr-FR');
+    document.getElementById('btnStart').disabled = active;
+    document.getElementById('btnStop').disabled  = !active;
+    document.querySelectorAll('.chip').forEach(function(c) {
+      c.className = 'chip' + (active ? ' active' : '');
+    });
+  }
+
+  async function callAction(action) {
+    var r = await fetch(BASE + '/' + action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}'
+    });
+    if (!r.ok) {
+      var txt = await r.text();
+      throw new Error('HTTP ' + r.status + ' — ' + txt.slice(0, 120));
+    }
+    var d = await r.json();
+    return d.value || d;
+  }
+
+  async function callFunction(fn) {
+    var r = await fetch(BASE + '/' + fn + '()', {
+      headers: { Accept: 'application/json' }
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    var d = await r.json();
+    return d.value || d;
+  }
+
+  async function pollStatut() {
+    try {
+      var data = await callFunction('statutSimulation');
+      updateUI(data);
+    } catch (e) {
+      log('Erreur polling : ' + e.message, 'err');
+    }
+  }
+
+  // ── Actions ────────────────────────────────────────────────
+  async function demarrer() {
+    document.getElementById('btnStart').disabled = true;
+    try {
+      var data = await callAction('demarrerSimulation');
+      updateUI(data);
+      log(data.message, 'ok');
+      if (pollId) clearInterval(pollId);
+      pollId = setInterval(pollStatut, 2500);
+    } catch (e) {
+      log('Erreur démarrage : ' + e.message, 'err');
+      document.getElementById('btnStart').disabled = false;
+    }
+  }
+
+  async function arreter() {
+    document.getElementById('btnStop').disabled = true;
+    try {
+      var data = await callAction('arreterSimulation');
+      updateUI(data);
+      log(data.message);
+      if (pollId) { clearInterval(pollId); pollId = null; }
+      await pollStatut();
+    } catch (e) {
+      log('Erreur arrêt : ' + e.message, 'err');
+    }
+  }
+
+  async function reset() {
+    document.getElementById('btnReset').disabled = true;
+    try {
+      var data = await callAction('resetSimulation');
+      updateUI(data);
+      log(data.message);
+      if (pollId) { clearInterval(pollId); pollId = null; }
+    } catch (e) {
+      log('Erreur reset : ' + e.message, 'err');
+    } finally {
+      document.getElementById('btnReset').disabled = false;
+    }
+  }
+
+  // Expose to onclick handlers
+  window.demarrer = demarrer;
+  window.arreter  = arreter;
+  window.reset    = reset;
+
+  // Statut initial au chargement
+  pollStatut();
+}());
+</script>
+</body>
+</html>

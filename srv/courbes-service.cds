@@ -44,4 +44,17 @@ service CourbesService @(path: '/odata/v4/courbes') {
     message         : String;
   };
 
+  // ── Actions simulateur temps réel ────────────────────────────
+  type SimulateurStatus {
+    statut       : String;   // 'active' | 'inactive'
+    nbReleves    : Integer;
+    heureSimulee : String;   // 'YYYY-MM-DD HH:MM' | '--'
+    message      : String;
+  }
+
+  action   demarrerSimulation() returns SimulateurStatus;
+  action   arreterSimulation()  returns SimulateurStatus;
+  action   resetSimulation()    returns SimulateurStatus;
+  function statutSimulation()   returns SimulateurStatus;
+
 }

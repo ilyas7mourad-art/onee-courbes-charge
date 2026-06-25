@@ -9,7 +9,8 @@
         { label: 'Relevés',        path: '/courbes-display/webapp/index.html' },
         { label: 'Cadrans',        path: '/cadrans/webapp/index.html' },
         { label: 'Résultats',      path: '/calculed/webapp/index.html' },
-        { label: 'Puissances max', path: '/pmax-display/webapp/index.html' }
+        { label: 'Puissances max', path: '/pmax-display/webapp/index.html' },
+        { label: 'Simulateur',     path: '/simulateur/webapp/index.html'    }
     ];
 
     // Le dossier de l'app courante suffit à identifier quelle tuile mettre en évidence.
