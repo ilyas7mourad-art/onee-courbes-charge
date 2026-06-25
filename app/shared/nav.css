@@ -1,0 +1,86 @@
+/* ── Bandeau de navigation commun ONEE ──────────────────────────────── */
+
+#onee-nav {
+  height: 2.5rem;
+  background: #ffffff;
+  border-bottom: 1px solid #d9d9d9;
+  display: flex;
+  align-items: stretch;
+  padding: 0;
+  font-family: "72", "72full", Arial, sans-serif;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+/* Lien "Accueil" / marque */
+.onee-nav-brand {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  padding: 0 1rem;
+  text-decoration: none;
+  color: inherit;
+  border-right: 1px solid #d9d9d9;
+  flex-shrink: 0;
+  transition: background .12s;
+}
+.onee-nav-brand:hover { background: #f5f6f7; }
+
+.onee-nav-logo {
+  font-size: .875rem;
+  font-weight: 700;
+  color: #1d2d3e;
+  letter-spacing: .01em;
+  white-space: nowrap;
+}
+
+.onee-nav-sep {
+  width: 1px;
+  height: 1rem;
+  background: #d9d9d9;
+  flex-shrink: 0;
+}
+
+.onee-nav-subtitle {
+  font-size: .8125rem;
+  color: #556b82;
+  white-space: nowrap;
+}
+@media (max-width: 780px) { .onee-nav-subtitle { display: none; } }
+
+/* Conteneur des liens */
+.onee-nav-links {
+  display: flex;
+  align-items: stretch;
+  padding: 0 .25rem;
+  overflow: hidden;
+}
+
+/* Lien individuel */
+.onee-nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0 .75rem;
+  text-decoration: none;
+  color: #556b82;
+  font-size: .8125rem;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  box-sizing: border-box;
+  transition: color .12s, border-color .12s, background .12s;
+}
+.onee-nav-link:hover {
+  color: #1d2d3e;
+  background: #f5f6f7;
+}
+
+/* Lien actif (écran courant) */
+.onee-nav-active {
+  color: #0070f2;
+  font-weight: 600;
+  border-bottom-color: #0070f2;
+}
+.onee-nav-active:hover {
+  color: #0070f2;
+  background: transparent;
+}
