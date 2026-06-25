@@ -1,11 +1,4 @@
-<core:FragmentDefinition xmlns:core="sap.ui.core" xmlns="sap.m">
-    <!--
-        Conteneur Chart.js pour la section "Courbe de charge" de l'ObjectPage.
-        sap.viz (VizFrame) n'est pas disponible sur le CDN public ui5.sap.com ;
-        Chart.js (cdn.jsdelivr.net) est utilisé à la place.
-        Le canvas est créé programmatiquement par CourbeSection.controller.js
-        (dans _renderChart) pour éviter les conflits avec le sanitizer HTML.
-    -->
+<core:FragmentDefinition xmlns:core="sap.ui.core">
     <core:HTML
         id="courbeChartHost"
         content="&lt;div id='courbeOPChartDiv' style='position:relative;height:400px;padding:8px 0 16px'&gt;&lt;/div&gt;"/>

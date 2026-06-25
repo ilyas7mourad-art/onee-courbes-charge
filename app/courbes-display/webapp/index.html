@@ -8,11 +8,7 @@
     html, body { height: 100%; margin: 0; padding: 0; }
     #content    { height: 100%; }
   </style>
-  <!-- Chart.js requis par l'ObjectPage (graphique courbe de charge) -->
-  <!-- sap.viz non disponible sur le CDN public ui5.sap.com -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
-  <!-- Chart.js — requis par la section "Courbe de charge" de l'ObjectPage -->
-  <!-- sap.viz non disponible sur le CDN public ui5.sap.com -->
+  <!-- Chart.js — sap.viz non disponible sur le CDN public ui5.sap.com -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js/dist/chart.umd.min.js"></script>
   <script
     id="sap-ui-bootstrap"
@@ -35,6 +31,236 @@
         }).placeAt("content");
       });
     });
+  </script>
+
+  <!--
+    Graphique courbe de charge – section custom ObjectPage.
+    Aucune extension sap.fe : rendu Chart.js piloté par setInterval.
+    Le SERGE est extrait soit depuis l'URL hash, soit depuis le contexte
+    de binding sap.uxap.ObjectPageLayout (fallback sans parsing d'URL).
+  -->
+  <script>
+  ;(function () {
+    'use strict';
+
+    var _chart        = null;
+    var _renderedSerge = null;
+    var _rendering    = false;
+
+    // ── 1. Détection ObjectPage ──────────────────────────────────────────
+    function isObjectPage() {
+      try {
+        return decodeURIComponent(window.location.hash).indexOf('ZccCourbeChargesIndexs(') >= 0;
+      } catch (e) {
+        return window.location.hash.indexOf('ZccCourbeChargesIndexs') >= 0;
+      }
+    }
+
+    // ── 2. Extraction du SERGE ───────────────────────────────────────────
+    // Source A : URL hash  (format: CLE_METIER='SERGE_DATE_HEURE_CADRAN')
+    function getSergeFromHash() {
+      try {
+        var h = decodeURIComponent(window.location.hash);
+        var m = h.match(/CLE_METIER='([^']+)'/);
+        if (m) {
+          var s = m[1].split('_')[0];
+          if (s) return s;
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    // Source B : contexte de binding SAPUI5 (disponible après chargement OData)
+    function getSergeFromModel() {
+      try {
+        if (typeof sap === 'undefined') return null;
+        var found = null;
+
+        // API SAPUI5 >= 1.120
+        if (sap.ui.core && sap.ui.core.Element && sap.ui.core.Element.registry) {
+          sap.ui.core.Element.registry.forEach(function (el) {
+            if (found) return;
+            if (el.isA && el.isA('sap.uxap.ObjectPageLayout')) {
+              var ctx = el.getBindingContext();
+              if (ctx) {
+                var s = ctx.getProperty('SERGE');
+                if (s) found = String(s);
+              }
+            }
+          });
+        }
+
+        // API SAPUI5 <= 1.119 (fallback)
+        if (!found) {
+          var core = sap.ui.getCore();
+          var els  = (core && core.mElements) ? core.mElements : {};
+          Object.keys(els).forEach(function (id) {
+            if (found) return;
+            var el = els[id];
+            if (el && el.isA && el.isA('sap.uxap.ObjectPageLayout')) {
+              var ctx = el.getBindingContext();
+              if (ctx) {
+                var s = ctx.getProperty('SERGE');
+                if (s) found = String(s);
+              }
+            }
+          });
+        }
+
+        return found;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function getSerge() {
+      return getSergeFromHash() || getSergeFromModel();
+    }
+
+    // ── 3. Boucle principale (setInterval – indépendant de hashchange) ───
+    setInterval(function () {
+      if (!isObjectPage()) {
+        if (_chart) {
+          _chart.destroy();
+          _chart = null;
+          _renderedSerge = null;
+        }
+        return;
+      }
+
+      var div = document.getElementById('courbeOPChartDiv');
+      if (!div) return;                       // section pas encore rendue
+
+      var serge = getSerge();
+      if (!serge) return;                     // OData pas encore chargé
+
+      if (serge === _renderedSerge && _chart) return;  // déjà à jour
+
+      if (_rendering) return;                 // appel en cours
+      _rendering = true;
+      console.log('[courbe] SERGE détecté :', serge);
+
+      renderChart(serge, div).finally(function () { _rendering = false; });
+    }, 300);
+
+    // ── 4. Fetch OData helper ────────────────────────────────────────────
+    async function fetchJson(url) {
+      var r = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!r.ok) throw new Error('HTTP ' + r.status + ' — ' + url);
+      return r.json();
+    }
+
+    // ── 5. Rendu Chart.js ────────────────────────────────────────────────
+    async function renderChart(serge, div) {
+      if (typeof Chart === 'undefined') {
+        div.textContent = 'Erreur : Chart.js non chargé (cdn.jsdelivr.net inaccessible ?)';
+        return;
+      }
+
+      // Réutilise le canvas existant ou en crée un
+      var canvas = div.querySelector('canvas');
+      if (!canvas) {
+        div.innerHTML = '';
+        canvas = document.createElement('canvas');
+        div.appendChild(canvas);
+      }
+
+      try {
+        var enc  = encodeURIComponent(serge);
+        var base = '/odata/v4/courbes/';
+
+        // Relevés — cadran EA d'abord, puis tous cadrans en fallback
+        var d1 = await fetchJson(
+          base + 'ZccCourbeChargesIndexs'
+          + '?$filter=SERGE%20eq%20%27' + enc + '%27%20and%20COD_CADRAN%20eq%20%27EA%27'
+          + '&$orderby=DAT_RELEVE%2CHEU_RELEVE&$select=DAT_RELEVE%2CHEU_RELEVE%2CVAL_CADRAN'
+        );
+        var releves = d1.value || [];
+        if (!releves.length) {
+          var d2 = await fetchJson(
+            base + 'ZccCourbeChargesIndexs'
+            + '?$filter=SERGE%20eq%20%27' + enc + '%27'
+            + '&$orderby=DAT_RELEVE%2CHEU_RELEVE&$select=DAT_RELEVE%2CHEU_RELEVE%2CVAL_CADRAN'
+          );
+          releves = d2.value || [];
+        }
+        console.log('[courbe] relevés chargés :', releves.length, '— SERGE', serge);
+
+        // Pmax par tranche tarifaire
+        var d3 = await fetchJson(
+          base + 'ZccCourbeChargesCalculed'
+          + '?$filter=serge%20eq%20%27' + enc + '%27&$select=codCadran%2Cpmax'
+        );
+        var pmap = {};
+        (d3.value || []).forEach(function (p) { pmap[p.codCadran] = parseFloat(p.pmax) || null; });
+        console.log('[courbe] pmap :', JSON.stringify(pmap));
+
+        var labels = releves.map(function (r) {
+          var d = r.DAT_RELEVE || '', t = r.HEU_RELEVE || '';
+          return d.slice(8,10) + '/' + d.slice(5,7) + ' ' + t.slice(0,5);
+        });
+        var values = releves.map(function (r) { return parseFloat(r.VAL_CADRAN) || 0; });
+        var n      = values.length;
+
+        var datasets = [{
+          label          : 'Courbe de charge',
+          data           : values,
+          borderColor    : '#1F7BC0',
+          backgroundColor: 'rgba(31,123,192,0.07)',
+          borderWidth    : 2,
+          pointRadius    : 3,
+          tension        : 0.3,
+          fill           : true,
+          order          : 0
+        }];
+
+        [
+          { key: 'PAIHP',  label: 'Pmax PAIHP (Pointe)',  color: '#E84444' },
+          { key: 'PAIHC',  label: 'Pmax PAIHC (Creuse)',  color: '#5B9BD5' },
+          { key: 'PAIHPL', label: 'Pmax PAIHPL (Pleine)', color: '#2DAB65' }
+        ].forEach(function (def) {
+          if (pmap[def.key] == null) return;
+          datasets.push({
+            label      : def.label + ' = ' + pmap[def.key] + ' kW',
+            data       : Array(n).fill(pmap[def.key]),
+            borderColor: def.color,
+            borderWidth: 1.5,
+            borderDash : [6, 4],
+            pointRadius: 0,
+            fill       : false,
+            order      : 1
+          });
+        });
+
+        if (_chart) { _chart.destroy(); _chart = null; }
+        _chart = new Chart(canvas, {
+          type: 'line',
+          data: { labels: labels, datasets: datasets },
+          options: {
+            responsive         : true,
+            maintainAspectRatio: false,
+            animation          : { duration: 300 },
+            plugins: {
+              title  : { display: true, text: 'Courbe de charge — ' + serge, font: { size: 13, weight: '600' } },
+              legend : { display: true },
+              tooltip: { mode: 'index', intersect: false }
+            },
+            scales: {
+              x: { ticks: { maxTicksLimit: 16, maxRotation: 45 } },
+              y: { title: { display: true, text: 'kW' }, beginAtZero: false }
+            }
+          }
+        });
+
+        _renderedSerge = serge;
+        console.log('[courbe] graphique rendu pour SERGE', serge, '—', n, 'points');
+
+      } catch (e) {
+        console.error('[courbe] renderChart error :', e);
+        div.textContent = 'Erreur chargement données : ' + e.message;
+      }
+    }
+  }());
   </script>
 </head>
 <body class="sapUiBody">

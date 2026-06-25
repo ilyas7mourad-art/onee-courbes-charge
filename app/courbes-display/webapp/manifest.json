@@ -28,15 +28,6 @@
 
   "sap.ui5": {
     "flexEnabled": false,
-    "extends": {
-      "extensions": {
-        "sap.ui.controllerExtensions": {
-          "sap.fe.templates.ObjectPage.ObjectPageController": {
-            "controllerName": "onee.courbes.courbesdisplay.ext.CourbeSection"
-          }
-        }
-      }
-    },
     "dependencies": {
       "minUI5Version": "1.108.0",
       "libs": {
